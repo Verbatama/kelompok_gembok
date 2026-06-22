@@ -12,6 +12,9 @@ use App\Http\Controllers\Admin\AgentController;
 use App\Http\Controllers\Admin\VoucherController;
 use App\Http\Controllers\Admin\OdpController;
 use App\Http\Controllers\Admin\TicketController;
+use App\Http\Controllers\Admin\ExpenseController;
+use App\Http\Controllers\Admin\TiketGangguanController;
+
 
 // Public Routes
 Route::get('/', function () {
@@ -120,6 +123,23 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/{ticket}/assign', [TicketController::class, 'assign'])->name('assign');
             Route::post('/{ticket}/status', [TicketController::class, 'updateStatus'])->name('status');
             Route::delete('/{ticket}', [TicketController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::get('ticket_gangguan', 'App\Http\Controllers\Admin\TiketGangguanController@index')->name('ticket_gangguan.index');
+        Route::get('ticket_gangguan/create', 'App\Http\Controllers\Admin\TiketGangguanController@create')->name('ticket_gangguan.create');
+        Route::post('ticket_gangguan', 'App\Http\Controllers\Admin\TiketGangguanController@store')->name('ticket_gangguan.store');
+        Route::get('ticket_gangguan/{id}', 'App\Http\Controllers\Admin\TiketGangguanController@show')->name('ticket_gangguan.show');
+        Route::delete('ticket_gangguan/{id}', 'App\Http\Controllers\Admin\TiketGangguanController@destroy')->name('ticket_gangguan.destroy');
+
+        // Expenses
+        Route::prefix('expenses')->name('expenses.')->group(function () {
+            Route::get('/', [ExpenseController::class, 'index'])->name('index');
+            Route::get('/create', [ExpenseController::class, 'create'])->name('create');
+            Route::post('/', [ExpenseController::class, 'store'])->name('store');
+            Route::get('/{expense}', [ExpenseController::class, 'show'])->name('show');
+            Route::get('/{expense}/edit', [ExpenseController::class, 'edit'])->name('edit');
+            Route::put('/{expense}', [ExpenseController::class, 'update'])->name('update');
+            Route::delete('/{expense}', [ExpenseController::class, 'destroy'])->name('destroy');
         });
 
         // Settings
@@ -311,8 +331,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/genieacs/test', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'testGenieacs'])->name('genieacs.test');
             
             // WhatsApp
-            Route::get('/whatsapp', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'whatsapp'])->name('whatsapp');
-            Route::post('/whatsapp', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveWhatsapp'])->name('whatsapp.save');
+            Route::get('/whatssapp', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveWhatsapp'])->name('whatsapp.save');
+            Route::post('/whatapp', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'whatsapp'])->name('whatsapp');
             Route::post('/whatsapp/test', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'testWhatsapp'])->name('whatsapp.test');
             
             // Midtrans

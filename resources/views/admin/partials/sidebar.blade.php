@@ -1,8 +1,6 @@
-<!-- Sidebar -->
 <div class="fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-slate-900 via-blue-900 to-cyan-900 transform transition-transform duration-300 ease-in-out lg:translate-x-0" 
      :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
     
-    <!-- Logo -->
     <div class="flex items-center justify-center h-16 bg-black bg-opacity-30 border-b border-cyan-500/20">
         <div class="flex items-center space-x-3">
             <div class="h-10 w-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
@@ -12,10 +10,8 @@
         </div>
     </div>
 
-    <!-- Navigation -->
     <nav class="mt-4 px-4 space-y-1 overflow-y-auto" style="max-height: calc(100vh - 180px);">
         
-        <!-- Main Menu -->
         <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2 mt-2">Main Menu</p>
         
         <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.dashboard') ? 'bg-white bg-opacity-20 text-white' : '' }}">
@@ -24,22 +20,20 @@
         </a>
         
         <div x-data="{ openCustomers: {{ request()->routeIs('admin.customers.*') ? 'true' : 'false' }} }">
-    
-    <button @click="openCustomers = !openCustomers" 
-        class="flex items-center w-full px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.customers.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-        <i class="fas fa-users w-5 mr-3"></i>
-        <span>Customers</span>
-        <i class="fas fa-chevron-down ml-auto text-xs transition-transform duration-200" :class="openCustomers ? 'rotate-180' : ''"></i>
-    </button>
-    
-    <div x-show="openCustomers" x-cloak class="mt-1 ml-4 pl-4 border-l border-cyan-500/30 space-y-1">
-        <a href="{{ route('admin.customers.index') }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">All Customers</a>
-        <a href="{{ route('admin.customers.index', ['status' => 'active']) }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">Active</a>
-        <a href="{{ route('admin.customers.index', ['status' => 'inactive']) }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">Inactive</a>
-        <a href="{{ route('admin.customers.index', ['status' => 'suspended']) }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">Suspended</a>
-    </div>
-
-</div>
+            <button @click="openCustomers = !openCustomers" 
+                class="flex items-center w-full px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.customers.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+                <i class="fas fa-users w-5 mr-3"></i>
+                <span>Customers</span>
+                <i class="fas fa-chevron-down ml-auto text-xs transition-transform duration-200" :class="openCustomers ? 'rotate-180' : ''"></i>
+            </button>
+            
+            <div x-show="openCustomers" x-cloak class="mt-1 ml-4 pl-4 border-l border-cyan-500/30 space-y-1">
+                <a href="{{ route('admin.customers.index') }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">All Customers</a>
+                <a href="{{ route('admin.customers.index', ['status' => 'active']) }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">Active</a>
+                <a href="{{ route('admin.customers.index', ['status' => 'inactive']) }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">Inactive</a>
+                <a href="{{ route('admin.customers.index', ['status' => 'suspended']) }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">Suspended</a>
+            </div>
+        </div>
         
         <a href="{{ route('admin.packages.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.packages.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
             <i class="fas fa-box w-5 mr-3"></i>
@@ -60,7 +54,11 @@
             @endif
         </a>
 
-        <!-- Staff -->
+        <a href="{{ route('admin.expenses.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.expenses.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+            <i class="fas fa-wallet w-5 mr-3"></i>
+            <span>Expenses</span>
+        </a>
+
         <div class="border-t border-cyan-500/20 my-3"></div>
         <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2">Staff</p>
         
@@ -79,7 +77,6 @@
             <span>Agents</span>
         </a>
         
-        <!-- Network -->
         <div class="border-t border-cyan-500/20 my-3"></div>
         <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2">Network</p>
         
@@ -103,7 +100,6 @@
             <span>Network Map</span>
         </a>
         
-        <!-- Services -->
         <div class="border-t border-cyan-500/20 my-3"></div>
         <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2">Services</p>
         
@@ -151,7 +147,6 @@
             <span>Payment Gateway</span>
         </a>
 
-        <!-- Reports -->
         <div class="border-t border-cyan-500/20 my-3"></div>
         <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2">Reports</p>
         
@@ -170,20 +165,23 @@
             <span>Monthly Report</span>
         </a>
         
-        <!-- Support -->
         <div class="border-t border-cyan-500/20 my-3"></div>
         <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2">Support</p>
-        
-        <a href="{{ route('admin.tickets.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.tickets.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-headset w-5 mr-3"></i>
-            <span>Tickets</span>
-            @php $openTickets = \App\Models\Ticket::whereIn('status', ['open', 'in_progress'])->count() ?? 0; @endphp
-            @if($openTickets > 0)
-            <span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{{ $openTickets }}</span>
-            @endif
-        </a>
-        
-        <!-- Settings -->
+
+        <div x-data="{ openTickets: {{ request()->routeIs('admin.ticket_gangguan.*') || request()->routeIs('admin.tickets.*') ? 'true' : 'false' }} }">
+            <button @click="openTickets = !openTickets" 
+                class="flex items-center w-full px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.ticket_gangguan.*') || request()->routeIs('admin.tickets.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+                <i class="fas fa-headset w-5 mr-3 flex-shrink-0"></i>
+                <span class="truncate text-left flex-1 text-sm">Ticket Management</span>
+                <i class="fas fa-chevron-down text-xs transition-transform duration-200 ml-2 flex-shrink-0" :class="openTickets ? 'rotate-180' : ''"></i>
+            </button>
+            
+            <div x-show="openTickets" x-cloak class="mt-1 ml-4 pl-4 border-l border-cyan-500/30 space-y-1">
+                <a href="{{ route('admin.ticket_gangguan.index') }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg {{ request()->routeIs('admin.ticket_gangguan.*') ? 'text-white font-semibold' : '' }}">Tiket Gangguan</a>
+                <a href="{{ route('admin.tickets.index') }}" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg {{ request()->routeIs('admin.tickets.*') ? 'text-white font-semibold' : '' }}">Tiket Umum</a>
+            </div>
+        </div>
+
         <div class="border-t border-cyan-500/20 my-3"></div>
         <p class="px-4 text-xs text-cyan-300/60 uppercase tracking-wider mb-2">Settings</p>
         
@@ -203,7 +201,6 @@
         </a>
     </nav>
 
-    <!-- Logout -->
     <div class="absolute bottom-0 w-full p-4 bg-gradient-to-t from-slate-900 to-transparent">
         <div class="flex space-x-2">
             <a href="{{ route('admin.change-password') }}" class="flex-1 flex items-center justify-center px-3 py-2 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition text-sm">
