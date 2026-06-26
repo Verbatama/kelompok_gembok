@@ -3,538 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Absensi - {{ config('app.name') }}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <style>
-        body {
-            background: #f4f6fa;
-            min-height: 100vh;
-        }
-
-        .attendance-wrapper {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 1.5rem 1rem 3rem;
-        }
-
-        .card-attendance {
-            background: #fff;
-            border-radius: 16px;
-            border: 1px solid #e5e7eb;
-            overflow: hidden;
-        }
-
-        .card-header-custom {
-            background: #1e3a5f;
-            color: #fff;
-            padding: 1.25rem 1.5rem;
-        }
-
-        .card-header-custom .role-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.15);
-            color: #fff;
-            font-size: 11px;
-            font-weight: 500;
-            padding: 3px 10px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Kamera */
-        #camera-box {
-            position: relative;
-            background: #0f1923;
-            width: 100%;
-            aspect-ratio: 4/3;
-            overflow: hidden;
-        }
-
-        #video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transform: scaleX(-1); /* mirror */
-        }
-
-        #canvas { display: none; }
-
-        /* Overlay saat kamera belum aktif */
-        #camera-placeholder {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #8899aa;
-            gap: 8px;
-        }
-
-        #camera-placeholder i { font-size: 48px; }
-        #camera-placeholder p { font-size: 13px; margin: 0; }
-
-        /* Preview foto yang sudah diambil */
-        #photo-preview {
-            display: none;
-            width: 100%;
-            aspect-ratio: 4/3;
-            object-fit: cover;
-        }
-
-        /* Tombol ambil foto */
-        .shutter-btn {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            border: 4px solid #1e3a5f;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.1s, background 0.15s;
-            flex-shrink: 0;
-        }
-
-        .shutter-btn:active { transform: scale(0.93); }
-        .shutter-btn i { font-size: 28px; color: #1e3a5f; }
-
-        .btn-retake {
-            border: 1px solid #d1d5db;
-            background: #fff;
-            color: #374151;
-            border-radius: 8px;
-            padding: 6px 16px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        .btn-retake:hover { background: #f3f4f6; }
-
-        /* Status cards */
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 12px;
-            font-weight: 500;
-            padding: 4px 10px;
-            border-radius: 20px;
-        }
-
-        .status-pill.done { background: #dcfce7; color: #166534; }
-        .status-pill.pending { background: #fef9c3; color: #713f12; }
-        .status-pill.late { background: #fee2e2; color: #991b1b; }
-
-        /* Jam */
-        #clock {
-            font-size: 32px;
-            font-weight: 600;
-            color: #1e3a5f;
-            letter-spacing: 1px;
-        }
-
-        #date-label { font-size: 13px; color: #6b7280; }
-
-        /* Alert */
-        .alert-custom {
-            border-radius: 10px;
-            font-size: 13px;
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary-custom {
-            background: #1e3a5f;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            padding: 12px 24px;
-            font-size: 15px;
-            font-weight: 500;
-            width: 100%;
-            cursor: pointer;
-            transition: background 0.15s, opacity 0.15s;
-        }
-
-        .btn-primary-custom:hover { background: #162d4a; }
-        .btn-primary-custom:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .btn-checkout-custom {
-            background: #0f5132;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            padding: 12px 24px;
-            font-size: 15px;
-            font-weight: 500;
-            width: 100%;
-            cursor: pointer;
-            transition: background 0.15s, opacity 0.15s;
-        }
-
-        .btn-checkout-custom:hover { background: #0a3d25; }
-        .btn-checkout-custom:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #f3f4f6;
-            font-size: 13px;
-        }
-
-        .info-row:last-child { border-bottom: none; }
-        .info-row .label { color: #6b7280; }
-        .info-row .value { font-weight: 500; color: #111827; }
-
-        #toast-container {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .toast-msg {
-            padding: 12px 18px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-            animation: slideIn 0.25s ease;
-            min-width: 240px;
-        }
-
-        .toast-msg.success { background: #166534; color: #fff; }
-        .toast-msg.error   { background: #991b1b; color: #fff; }
-
-        @keyframes slideIn {
-            from { transform: translateX(60px); opacity: 0; }
-            to   { transform: translateX(0);    opacity: 1; }
-        }
-
-        #location-text { font-size: 12px; color: #6b7280; }
-    </style>
+    <title>Sistem Absensi Mandiri</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen py-10 px-4">
 
-<div id="toast-container"></div>
-
-<div class="attendance-wrapper">
-
-    {{-- Header info user --}}
-    <div class="card-attendance mb-3">
-        <div class="card-header-custom">
-    <div class="d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center gap-3">
-            <div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.15);
-                        display:flex;align-items:center;justify-content:center;
-                        font-weight:600;font-size:16px;flex-shrink:0;">
-                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-            </div>
-            
-            <div>
-                {{-- Mengambil nama user langsung dari database yang sedang login --}}
-                <p style="margin:0;font-weight:600;font-size:16px;line-height:1.2;">{{ Auth::user()->name }}</p>
-            </div>
-        </div>
+    <div class="max-w-4xl mx-auto">
         
-        <span class="role-badge">
-            {{ Auth::user()->role ?? 'Teknisi' }}
-        </span>
-    </div>
-</div>
-
-        <div class="p-3">
-            {{-- Jam & tanggal --}}
-            <div class="text-center mb-3">
-                <div id="clock">00:00:00</div>
-                <div id="date-label">—</div>
+        <div class="bg-white rounded-2xl p-6 shadow-md mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Sistem Absensi Mandiri</h1>
+                <p class="text-gray-500">Silakan ambil selfie dan tentukan status absensi Anda.</p>
             </div>
+            <div class="text-center md:text-right bg-blue-50 text-blue-700 px-6 py-3 rounded-xl border border-blue-100">
+                <div id="clock" class="text-3xl font-black tracking-wider">00:00:00</div>
+                <div id="date" class="text-sm font-medium mt-1 text-blue-600">Hari, Tanggal</div>
+            </div>
+        </div>
 
-            {{-- Status absen hari ini --}}
-            @if($absenHariIni)
-                <div class="mb-3">
-                    <div class="info-row">
-                        <span class="label">Check-in</span>
-                        <span class="value">
-                            @if($absenHariIni->check_in)
-                                {{ $absenHariIni->check_in->format('H:i:s') }}
-                                <span class="status-pill {{ $absenHariIni->status === 'terlambat' ? 'late' : 'done' }} ms-1">
-                                    {{ $absenHariIni->status }}
-                                </span>
-                            @else
-                                <span class="status-pill pending">Belum</span>
-                            @endif
-                        </span>
+        @if(session('success'))
+            <div class="bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <div class="bg-white rounded-2xl p-6 shadow-md">
+                <form action="{{ route('absensi.store') }}" method="POST" id="form-absen">
+                    @csrf
+                    
+                    <div class="mb-5">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-gray-700 font-semibold" for="nama">Nama Karyawan</label>
+                            <button type="button" id="btn-ganti-nama" onclick="clearSavedName()" class="text-xs text-red-600 hover:underline hidden">
+                                Ganti Pengguna?
+                            </button>
+                        </div>
+                        <input type="text" name="nama" id="nama" placeholder="Masukkan nama lengkap..." 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-gray-800 transition duration-150" required>
                     </div>
-                    <div class="info-row">
-                        <span class="label">Check-out</span>
-                        <span class="value">
-                            @if($absenHariIni->check_out)
-                                {{ $absenHariIni->check_out->format('H:i:s') }}
-                                <span class="status-pill done ms-1">Selesai</span>
-                            @else
-                                <span class="status-pill pending">Belum</span>
-                            @endif
-                        </span>
+
+                    <input type="hidden" name="latitude" id="latitude">
+                    <input type="hidden" name="longitude" id="longitude">
+                    <input type="hidden" name="selfie" id="selfie-base64">
+                    <input type="hidden" name="status" id="status-absen" value="check-in"> 
+
+                    <div class="mb-5">
+                        <label class="block text-gray-700 font-semibold mb-2">Kamera Selfie</label>
+                        <div class="relative w-full aspect-[4/3] bg-gray-900 rounded-xl overflow-hidden border border-gray-200 shadow-inner flex items-center justify-center">
+                            <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
+                            <img id="preview" class="hidden w-full h-full object-cover absolute top-0 left-0">
+                            <canvas id="canvas" class="hidden"></canvas>
+                        </div>
                     </div>
+
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <button type="button" onclick="take_snapshot()" id="btn-capture" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-xl transition duration-200 cursor-pointer text-center text-sm">
+                            Ambil Foto
+                        </button>
+                        <button type="button" onclick="reset_camera()" id="btn-reset" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2.5 px-4 rounded-xl transition duration-200 hidden cursor-pointer text-center text-sm">
+                            Foto Ulang
+                        </button>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-gray-700 font-semibold mb-2">Lokasi Anda (Peta)</label>
+                        <div id="map" class="w-full h-48 rounded-xl border border-gray-200 shadow-sm z-0"></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button type="button" onclick="submitAbsen('check-in')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/20 transition duration-200 cursor-pointer text-center">
+                            Check In
+                        </button>
+                        <button type="button" onclick="submitAbsen('check-out')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-rose-600/20 transition duration-200 cursor-pointer text-center">
+                            Check Out
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-md flex flex-col">
+                <h2 class="text-lg font-bold text-gray-800 mb-4">Riwayat Absen Hari Ini</h2>
+                <div class="overflow-x-auto flex-1">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-100 text-gray-400 text-sm font-semibold">
+                                <th class="pb-3">Nama</th>
+                                <th class="pb-3">Jam</th>
+                                <th class="pb-3">Status</th>
+                                <th class="pb-3 text-center">Foto</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50 text-sm text-gray-600">
+                            @forelse($riwayatAbsen as $row)
+                                <tr>
+                                    <td class="py-3 font-medium text-gray-800">{{ $row->nama }}</td>
+                                    <td class="py-3">{{ date('H:i', strtotime($row->created_at)) }} WIB</td>
+                                    <td class="py-3">
+                                        <span class="px-2.5 py-1 rounded-md text-xs font-bold {{ ($row->status ?? 'check-in') == 'check-in' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100' }}">
+                                            {{ strtoupper($row->status ?? 'check-in') }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 flex justify-center">
+                                        @if(isset($row->image_selfie) && $row->image_selfie)
+                                            <img src="{{ asset($row->image_selfie) }}" class="w-12 h-12 rounded-lg object-cover border border-gray-200">
+                                        @else
+                                            <span class="text-xs text-gray-400">Tidak ada foto</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="py-6 text-center text-gray-400 italic">Belum ada absensi masuk hari ini.</td>
+                                }
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
-            @else
-                <div class="alert alert-warning alert-custom mb-3">
-                    <i class="bi bi-clock-history"></i>
-                    Anda belum absen hari ini.
+                <div class="mt-4">
+                    {{ $riwayatAbsen->links() }}
                 </div>
-            @endif
+            </div>
+
         </div>
     </div>
 
-    {{-- Kamera --}}
-    @if(!$sudahCheckOut)
-    <div class="card-attendance mb-3">
-        <div id="camera-box">
-            <video id="video" autoplay playsinline></video>
-            <canvas id="canvas"></canvas>
-            <div id="camera-placeholder">
-                <i class="bi bi-camera-video-off"></i>
-                <p>Klik tombol kamera untuk mengaktifkan</p>
-            </div>
-            <img id="photo-preview" alt="Foto absen">
-        </div>
+    <script>
+        let map;
+        let marker;
 
-        {{-- Kontrol kamera --}}
-        <div class="p-3">
-            {{-- Lokasi --}}
-            <div class="d-flex align-items-center gap-2 mb-3">
-                <i class="bi bi-geo-alt text-secondary" style="font-size:14px;"></i>
-                <span id="location-text">Mendeteksi lokasi...</span>
-            </div>
+        const namaInput = document.getElementById('nama');
+        const btnGantiNama = document.getElementById('btn-ganti-nama');
 
-            {{-- Tombol --}}
-            <div class="d-flex align-items-center justify-content-center gap-3 mb-3">
-                {{-- Tombol aktifkan kamera --}}
-                <button id="btn-start-camera" onclick="startCamera()" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                    <i class="bi bi-camera-video me-1"></i> Aktifkan Kamera
-                </button>
+        // Fungsi Memeriksa Nama yang Tersimpan di Browser
+        function checkSavedUser() {
+            const savedName = localStorage.getItem('absensi_user_name');
+            if (savedName) {
+                namaInput.value = savedName;
+                namaInput.readOnly = true;
+                namaInput.classList.add('bg-gray-100', 'text-gray-500', 'cursor-not-allowed');
+                btnGantiNama.classList.remove('hidden');
+            }
+        }
 
-                {{-- Shutter --}}
-                <button id="btn-capture" class="shutter-btn" onclick="ambilFoto()" disabled title="Ambil foto">
-                    <i class="bi bi-camera"></i>
-                </button>
+        // Fungsi Menghapus Nama Terkunci
+        function clearSavedName() {
+            localStorage.removeItem('absensi_user_name');
+            namaInput.value = '';
+            namaInput.readOnly = false;
+            namaInput.classList.remove('bg-gray-100', 'text-gray-500', 'cursor-not-allowed');
+            btnGantiNama.classList.add('hidden');
+            namaInput.focus();
+        }
 
-                {{-- Ulangi foto --}}
-                <button id="btn-retake" class="btn-retake" onclick="ulangi()" style="display:none;">
-                    <i class="bi bi-arrow-counterclockwise me-1"></i> Ulangi
-                </button>
-            </div>
+        // 1. Digital Jam Realtime
+        function updateClock() {
+            const now = new Date();
+            const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            
+            document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID');
+            document.getElementById('date').textContent = now.toLocaleDateString('id-ID', optionsDate);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-            {{-- Tombol submit --}}
-            @if(!$sudahCheckIn)
-                <button id="btn-checkin" class="btn-primary-custom" onclick="submitAbsen('check_in')" disabled>
-                    <i class="bi bi-box-arrow-in-right me-2"></i> Check In
-                </button>
-            @elseif(!$sudahCheckOut)
-                <button id="btn-checkout" class="btn-checkout-custom" onclick="submitAbsen('check_out')" disabled>
-                    <i class="bi bi-box-arrow-right me-2"></i> Check Out
-                </button>
-            @endif
-        </div>
-    </div>
-    @else
-        {{-- Sudah check-in dan check-out --}}
-        <div class="card-attendance p-4 text-center">
-            <i class="bi bi-check-circle-fill text-success" style="font-size:48px;"></i>
-            <h5 class="mt-3 mb-1">Absensi Selesai</h5>
-            <p class="text-muted" style="font-size:13px;">Anda sudah check-in dan check-out hari ini.</p>
-        </div>
-    @endif
+        // Run cek user saat web selesai dimuat
+        checkSavedUser();
 
-    
-    
+        // 2. Setup Kamera Stream HTML5
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const preview = document.getElementById('preview');
+        const btnCapture = document.getElementById('btn-capture');
+        const btnReset = document.getElementById('btn-reset');
+        const selfieInput = document.getElementById('selfie-base64');
 
-</div>{{-- /attendance-wrapper --}}
-
-<script>
-    // State
-    let stream        = null;
-    let fotoBase64    = null;
-    let latitude      = null;
-    let longitude     = null;
-    let address       = '';
-
-    const video         = document.getElementById('video');
-    const canvas        = document.getElementById('canvas');
-    const preview       = document.getElementById('photo-preview');
-    const placeholder   = document.getElementById('camera-placeholder');
-    const btnCapture    = document.getElementById('btn-capture');
-    const btnRetake     = document.getElementById('btn-retake');
-    const btnStartCam   = document.getElementById('btn-start-camera');
-    const btnCheckin    = document.getElementById('btn-checkin');
-    const btnCheckout   = document.getElementById('btn-checkout');
-
-    // Jam realtime
-    function updateClock() {
-        const now = new Date();
-        document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID');
-        document.getElementById('date-label').textContent = now.toLocaleDateString('id-ID', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: "user" }, 
+            audio: false 
+        })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(err => {
+            alert("Gagal mengakses kamera: " + err.message + ". Pastikan izin kamera diberikan.");
         });
-    }
-    updateClock();
-    setInterval(updateClock, 1000);
 
-    // Geolocation
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            pos => {
-                latitude  = pos.coords.latitude;
-                longitude = pos.coords.longitude;
-                document.getElementById('location-text').textContent =
-                    `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+        function take_snapshot() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const dataUri = canvas.toDataURL('image/jpeg', 0.9);
+            selfieInput.value = dataUri;
+            
+            preview.src = dataUri;
+            preview.classList.remove('hidden');
+            video.classList.add('hidden');
+            
+            btnCapture.classList.add('hidden');
+            btnReset.classList.remove('hidden');
+        }
 
-                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
-                    .then(r => r.json())
-                    .then(d => {
-                        address = d.display_name ?? '';
-                        const short = d.address
-                            ? [d.address.road, d.address.suburb, d.address.city].filter(Boolean).join(', ')
-                            : address;
-                        document.getElementById('location-text').textContent = short || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
-                    })
-                    .catch(() => {});
-            },
-            () => {
-                document.getElementById('location-text').textContent = 'Lokasi tidak tersedia';
-            }
-        );
-    } else {
-        document.getElementById('location-text').textContent = 'GPS tidak didukung browser ini';
-    }
+        function reset_camera() {
+            selfieInput.value = '';
+            preview.classList.add('hidden');
+            video.classList.remove('hidden');
+            
+            btnCapture.classList.remove('hidden');
+            btnReset.classList.add('hidden');
+        }
 
-    // Kamera
-    async function startCamera() {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-                audio: false
+        // 3. Geolocation & Leaflet Map
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                
+                document.getElementById('latitude').value = lat;
+                document.getElementById('longitude').value = lng;
+
+                map = L.map('map').setView([lat, lng], 15);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+
+                marker = L.marker([lat, lng]).addTo(map)
+                    .bindPopup('Lokasi Anda Saat Ini')
+                    .openPopup();
+
+            }, function(error) {
+                console.warn('Gagal memuat koordinat lokasi: ' + error.message);
+                initDefaultMap(-6.200000, 106.816666);
             });
-            video.srcObject       = stream;
-            video.style.display   = 'block';
-            placeholder.style.display = 'none';
-            btnCapture.disabled   = false;
-            btnStartCam.style.display = 'none';
-        } catch (e) {
-            toast('Tidak dapat mengakses kamera. Pastikan izin kamera sudah diberikan.', 'error');
-        }
-    }
-
-    function ambilFoto() {
-        if (!stream) return;
-
-        canvas.width  = video.videoWidth  || 640;
-        canvas.height = video.videoHeight || 480;
-
-        const ctx = canvas.getContext('2d');
-        ctx.translate(canvas.width, 0);
-        ctx.scale(-1, 1);
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        fotoBase64 = canvas.toDataURL('image/jpeg', 0.85);
-
-        preview.src           = fotoBase64;
-        preview.style.display = 'block';
-        video.style.display   = 'none';
-
-        btnCapture.style.display  = 'none';
-        btnRetake.style.display   = 'inline-block';
-
-        if (btnCheckin)  btnCheckin.disabled  = false;
-        if (btnCheckout) btnCheckout.disabled = false;
-
-        stream.getTracks().forEach(t => t.stop());
-        stream = null;
-    }
-
-    function ulangi() {
-        fotoBase64 = null;
-        preview.style.display     = 'none';
-        btnRetake.style.display   = 'none';
-        btnCapture.style.display  = 'flex';
-        btnStartCam.style.display = 'inline-block';
-
-        if (btnCheckin)  btnCheckin.disabled  = true;
-        if (btnCheckout) btnCheckout.disabled = true;
-
-        startCamera();
-    }
-
-    // Submit absen
-    async function submitAbsen(type) {
-        if (!fotoBase64) {
-            toast('Ambil foto selfie terlebih dahulu.', 'error');
-            return;
+        } else {
+            console.warn('Browser tidak support fitur Geolocation.');
+            initDefaultMap(-6.200000, 106.816666);
         }
 
-        const btn = type === 'check_in' ? btnCheckin : btnCheckout;
-        btn.disabled  = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Menyimpan...';
+        function initDefaultMap(lat, lng) {
+            map = L.map('map').setView([lat, lng], 11);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        }
 
-        try {
-            const res = await fetch('{{ route("attendance.store") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type'     : 'application/json',
-                    'X-CSRF-TOKEN'     : document.querySelector('meta[name="csrf-token"]').content,
-                    'Accept'           : 'application/json',
-                },
-                body: JSON.stringify({
-                    photo    : fotoBase64,
-                    latitude : latitude,
-                    longitude: longitude,
-                    address  : address,
-                    type     : type,
-                }),
-            });
-
-            const data = await res.json();
-
-            if (data.success) {
-                toast(data.message, 'success');
-                setTimeout(() => location.reload(), 1500);
-            } else {
-                toast(data.message ?? 'Terjadi kesalahan.', 'error');
-                btn.disabled  = false;
-                btn.innerHTML = type === 'check_in'
-                    ? '<i class="bi bi-box-arrow-in-right me-2"></i> Check In'
-                    : '<i class="bi bi-box-arrow-right me-2"></i> Check Out';
+        // 4. Handle Submit Multi-tombol
+        function submitAbsen(type) {
+            const nama = namaInput.value.trim();
+            
+            if (!nama) {
+                alert('Silakan isi nama Anda terlebih dahulu.');
+                return;
             }
-        } catch (e) {
-            toast('Koneksi bermasalah. Coba lagi.', 'error');
-            btn.disabled  = false;
+            if (!selfieInput.value) {
+                alert('Silakan ambil foto selfie terlebih dahulu sebelum mengirim absensi.');
+                return;
+            }
+
+            // Simpan nama ke localStorage biar tidak perlu ngetik lagi saat checkout
+            localStorage.setItem('absensi_user_name', nama);
+
+            document.getElementById('status-absen').value = type;
+            document.getElementById('form-absen').submit();
         }
-    }
-
-    // Toast notifikasi
-    function toast(msg, type = 'success') {
-        const el = document.createElement('div');
-        el.className = `toast-msg ${type}`;
-        el.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>${msg}`;
-        document.getElementById('toast-container').appendChild(el);
-        setTimeout(() => el.remove(), 3500);
-    }
-</script>
-
+    </script>
 </body>
 </html>

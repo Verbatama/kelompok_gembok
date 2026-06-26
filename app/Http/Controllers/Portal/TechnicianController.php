@@ -19,12 +19,12 @@ class TechnicianController extends Controller
             'password' => 'required',
         ]);
 
-        $technician = Technician::where('username', $request->username)
+        $technician = Technician::where('name', $request->username)
                                 ->orWhere('email', $request->username)
                                 ->first();
 
         if ($technician && Hash::check($request->password, $technician->password)) {
-            Auth::loginUsingId($technician->user_id ?? $technician->id);
+            
             session(['technician_id' => $technician->id]);
             return redirect()->route('technician.dashboard');
         }

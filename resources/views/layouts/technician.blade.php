@@ -52,6 +52,7 @@
                 <i class="fas fa-map-marked-alt w-5 mr-3"></i>
                 <span>Peta Jaringan</span>
             </a>
+            
             <a href="{{ route('technician.profile') }}" class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.profile*') ? 'bg-slate-700 text-white' : '' }}">
                 <i class="fas fa-user-cog w-5 mr-3"></i>
                 <span>Profil</span>

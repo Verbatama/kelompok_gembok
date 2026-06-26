@@ -14,20 +14,22 @@ use App\Http\Controllers\Admin\OdpController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\TiketGangguanController;
-use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AttendancesController;
+
+// Halaman utama absensi umum
+Route::get('/absensi', [AttendancesController::class, 'index'])->name('attendance.index');
+
+// Proses simpan absen masuk
+Route::post('/absensi/store', [AttendancesController::class, 'store'])->name('absensi.store');
 
 
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-    Route::post('/attendance/store', [AttendanceController::class, 'store'])->name('attendance.store');
-});
 
 
 
 // ============================================================
 // Public Routes
-// ============ ================================================
+// ============================================================
 Route::get('/', function () {
     $packages = \App\Models\Package::where('is_active', true)->orderBy('price')->get();
     return view('welcome', compact('packages'));
@@ -461,6 +463,12 @@ Route::prefix('technician')->name('technician.')->group(function () {
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Portal\TechnicianController::class, 'dashboard'])->name('dashboard');
         Route::post('/logout', [\App\Http\Controllers\Portal\TechnicianController::class, 'logout'])->name('logout');
+
+        // Attendance Technician
+        Route::get('/attendance', [TechnicianAttendanceController::class, 'index'])->name('attendance.index');
+        Route::post('/attendance/store', [TechnicianAttendanceController::class, 'store'])->name('attendance.store');
+        Route::post('/attendance/checkout/{id}', [TechnicianAttendanceController::class, 'checkout'])->name('attendance.checkout');
+
         Route::get('/tasks', [\App\Http\Controllers\Portal\TechnicianController::class, 'tasks'])->name('tasks');
         Route::get('/tasks/{task}', [\App\Http\Controllers\Portal\TechnicianController::class, 'showTask'])->name('tasks.show');
         Route::post('/tasks/{task}/update', [\App\Http\Controllers\Portal\TechnicianController::class, 'updateTask'])->name('tasks.update');
