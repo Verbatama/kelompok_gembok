@@ -171,36 +171,36 @@ class CustomerController extends Controller
         return view('customer.payments', compact('customer', 'payments'));
     }
 
-    public function pay(Request $request, Invoice $invoice)
-    {
-        $customer = $this->getCustomer();
-        if (!$customer) {
-            return redirect()->route('customer.login');
-        }
-        
-        if ($invoice->customer_id != $customer->id) {
-            abort(403);
-        }
+        public function pay(Request $request, Invoice $invoice)
+        {
+            $customer = $this->getCustomer();
+            if (!$customer) {
+                return redirect()->route('customer.login');
+            }
+            
+            if ($invoice->customer_id != $customer->id) {
+                abort(403);
+            }
 
-        $paymentService = new PaymentGatewayService();
-        $gateway = $request->get('gateway', 'midtrans');
+            $paymentService = new PaymentGatewayService();
+            $gateway = $request->get('gateway', 'midtrans');
 
-        if ($gateway === 'midtrans') {
-            $result = $paymentService->createMidtransPayment($invoice);
-        } else {
-            $result = $paymentService->createXenditInvoice($invoice);
+            if ($gateway === 'midtrans') {
+                $result = $paymentService->createMidtransPayment($invoice, $customer);
+            } else {
+                $result = $paymentService->createXenditInvoice($invoice, $customer);
+            }
+
+            if (isset($result['redirect_url'])) {
+                return redirect($result['redirect_url']);
+            }
+
+            if (isset($result['snap_token'])) {
+                return view('customer.pay', compact('invoice', 'result'));
+            }
+
+            return back()->with('error', 'Gagal membuat pembayaran');
         }
-
-        if (isset($result['redirect_url'])) {
-            return redirect($result['redirect_url']);
-        }
-
-        if (isset($result['snap_token'])) {
-            return view('customer.pay', compact('invoice', 'result'));
-        }
-
-        return back()->with('error', 'Gagal membuat pembayaran');
-    }
 
     public function profile()
     {
@@ -299,3 +299,5 @@ class CustomerController extends Controller
         return view('customer.usage', compact('customer'));
     }
 }
+
+

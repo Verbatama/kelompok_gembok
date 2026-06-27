@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +8,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 min-h-screen flex items-center justify-center p-4">
+
+<body
+    class="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-md">
         <!-- Logo & Title -->
         <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg mb-4">
+            <div
+                class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg mb-4">
                 <i class="fas fa-hand-holding-dollar text-white text-3xl"></i>
             </div>
             <h1 class="text-3xl font-bold text-white">Collector Portal</h1>
@@ -32,7 +36,7 @@
                     <label class="block text-blue-200 text-sm font-medium mb-2">
                         <i class="fas fa-user mr-2"></i>Username
                     </label>
-                    <input type="text" name="username" required
+                    <input type="text" name="name" required
                         class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Masukkan username">
                 </div>
@@ -48,7 +52,8 @@
 
                 <div class="flex items-center justify-between mb-6">
                     <label class="flex items-center text-blue-200 text-sm">
-                        <input type="checkbox" name="remember" class="mr-2 rounded bg-white/10 border-white/20 text-blue-500 focus:ring-blue-500">
+                        <input type="checkbox" name="remember"
+                            class="mr-2 rounded bg-white/10 border-white/20 text-blue-500 focus:ring-blue-500">
                         Ingat saya
                     </label>
                 </div>
@@ -68,4 +73,5 @@
         </div>
     </div>
 </body>
+
 </html>

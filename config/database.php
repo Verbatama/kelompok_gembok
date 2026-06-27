@@ -4,6 +4,8 @@ use Illuminate\Support\Str;
 
 return [
 
+
+
     /*
     |--------------------------------------------------------------------------
     | Default Database Connection Name
@@ -113,6 +115,17 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'freeradius' => [
+            'driver' => 'mysql',
+            'host' => env('FR_DB_HOST'),
+            'port' => env('FR_DB_PORT'),
+            'database' => env('FR_DB_DATABASE'),
+            'username' => env('FR_DB_USERNAME'),
+            'password' => env('FR_DB_PASSWORD'),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+        ],
+
     ],
 
     /*
@@ -148,7 +161,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-database-'),
+            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')) . '-database-'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 

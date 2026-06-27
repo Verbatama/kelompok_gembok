@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,13 +10,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
+
 <body class="bg-gray-50 min-h-screen" x-data="{ sidebarOpen: false }">
     <!-- Mobile Sidebar Overlay -->
     <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300"
         x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-        x-transition:leave="transition-opacity ease-linear duration-300"
-        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-        class="fixed inset-0 bg-gray-900/50 z-40 lg:hidden" @click="sidebarOpen = false"></div>
+        x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-900/50 z-40 lg:hidden"
+        @click="sidebarOpen = false"></div>
 
     <!-- Sidebar -->
     <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
@@ -23,7 +25,8 @@
         <!-- Logo -->
         <div class="flex items-center justify-center h-16 border-b border-slate-700">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+                <div
+                    class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
                     <i class="fas fa-tools text-white"></i>
                 </div>
                 <span class="text-xl font-bold text-white">Technician</span>
@@ -32,28 +35,32 @@
 
         <!-- Navigation -->
         <nav class="p-4 space-y-2">
-            <a href="{{ route('technician.dashboard') }}" class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.dashboard') ? 'bg-slate-700 text-white' : '' }}">
+            <a href="{{ route('technician.dashboard') }}"
+                class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.dashboard') ? 'bg-slate-700 text-white' : '' }}">
                 <i class="fas fa-home w-5 mr-3"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="{{ route('technician.tasks') }}" class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.tasks*') ? 'bg-slate-700 text-white' : '' }}">
-                <i class="fas fa-tasks w-5 mr-3"></i>
-                <span>Tugas Saya</span>
+            <a href="{{ route('technician.tasks') }}"
+                class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.tasks*') ? 'bg-slate-700 text-white' : '' }}">
+                <i class="fas fa-plug w-5 mr-3"></i>
+                <span>Daftar Pemasangan</span>
             </a>
-            <a href="{{ route('technician.installations') }}" class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.installations*') ? 'bg-slate-700 text-white' : '' }}">
+            <!-- <a href="{{ route('technician.installations') }}" class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.installations*') ? 'bg-slate-700 text-white' : '' }}">
                 <i class="fas fa-plug w-5 mr-3"></i>
                 <span>Instalasi</span>
-            </a>
-            <a href="{{ route('technician.repairs') }}" class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.repairs*') ? 'bg-slate-700 text-white' : '' }}">
+            </a> -->
+            <a href="{{ route('technician.repairs') }}"
+                class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.repairs*') ? 'bg-slate-700 text-white' : '' }}">
                 <i class="fas fa-wrench w-5 mr-3"></i>
                 <span>Perbaikan</span>
             </a>
-            <a href="{{ route('technician.map') }}" class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.map*') ? 'bg-slate-700 text-white' : '' }}">
+            <a href="{{ route('technician.map') }}"
+                class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.map*') ? 'bg-slate-700 text-white' : '' }}">
                 <i class="fas fa-map-marked-alt w-5 mr-3"></i>
                 <span>Peta Jaringan</span>
             </a>
-            
-            <a href="{{ route('technician.profile') }}" class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.profile*') ? 'bg-slate-700 text-white' : '' }}">
+            <a href="{{ route('technician.profile') }}"
+                class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.profile*') ? 'bg-slate-700 text-white' : '' }}">
                 <i class="fas fa-user-cog w-5 mr-3"></i>
                 <span>Profil</span>
             </a>
@@ -63,7 +70,8 @@
         <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
             <form action="{{ route('technician.logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="flex items-center w-full px-4 py-3 text-gray-300 rounded-lg hover:bg-red-600 hover:text-white transition">
+                <button type="submit"
+                    class="flex items-center w-full px-4 py-3 text-gray-300 rounded-lg hover:bg-red-600 hover:text-white transition">
                     <i class="fas fa-sign-out-alt w-5 mr-3"></i>
                     <span>Keluar</span>
                 </button>
@@ -104,4 +112,5 @@
         </main>
     </div>
 </body>
+
 </html>

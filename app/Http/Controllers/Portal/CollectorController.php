@@ -17,15 +17,15 @@ class CollectorController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'username' => 'required',
+            'name' => 'required',
             'password' => 'required',
         ]);
 
-        $collector = Collector::where('username', $request->username)->first();
+        $collector = Collector::where('name', $request->name)->first();
 
         if ($collector && Hash::check($request->password, $collector->password)) {
             Auth::loginUsingId($collector->user_id ?? $collector->id);
-            session(['collector_id' => $collector->id]);
+            session(['collector_id' => $collector->id]);    
             return redirect()->route('collector.dashboard');
         }
 

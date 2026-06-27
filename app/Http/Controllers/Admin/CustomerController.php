@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Events\CustomerSuspended;
 use App\Services\MikrotikService;
 use Illuminate\Http\Request;
+use App\Notifications\SystemNotification;
+
 
 class CustomerController extends Controller
 {
@@ -65,6 +67,19 @@ class CustomerController extends Controller
         $validated['join_date'] = now();
 
         $customer = \App\Models\Customer::create($validated);
+
+        $users= \App\Models\User::all();
+         foreach( $users as $user ) {
+            $user->notify(
+                new SystemNotification(
+                    title: 'Customer Baru',
+                    message:"Pelanggan {$customer->username} berhasil dibuat",
+                    url:route('admin.customers.show', $customer->id),
+                    type: 'success'
+                )
+            );
+         }
+
 
         // Sync to Mikrotik if PPPoE credentials provided
         $mikrotikMessage = '';

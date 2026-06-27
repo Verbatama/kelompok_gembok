@@ -403,6 +403,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
             Route::get('/logs', [\App\Http\Controllers\Admin\HotspotController::class, 'logs'])->name('logs');
         });
+        Route::get('/database/import', [\App\Http\Controllers\Admin\CustomerImportController::class, 'index'])
+            ->name('database.import');
+
+        Route::post('/database/import', [\App\Http\Controllers\Admin\CustomerImportController::class, 'store'])
+            ->name('database.import.store');
+
+        // Halaman export
+        Route::get('/database/export', [\App\Http\Controllers\Admin\CustomerExportController::class, 'index'])->name('database.export');
+
+        // Download excel/csv
+        Route::get('/database/export/download', [\App\Http\Controllers\Admin\CustomerExportController::class, 'export'])->name('database.export.download');
+
+        Route::get('/ppoe-monitoring', [\App\Http\Controllers\Admin\PPOEMonitoringController::class, 'index']);
+
     });
 });
 
@@ -464,10 +478,7 @@ Route::prefix('technician')->name('technician.')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Portal\TechnicianController::class, 'dashboard'])->name('dashboard');
         Route::post('/logout', [\App\Http\Controllers\Portal\TechnicianController::class, 'logout'])->name('logout');
 
-        // Attendance Technician
-        Route::get('/attendance', [TechnicianAttendanceController::class, 'index'])->name('attendance.index');
-        Route::post('/attendance/store', [TechnicianAttendanceController::class, 'store'])->name('attendance.store');
-        Route::post('/attendance/checkout/{id}', [TechnicianAttendanceController::class, 'checkout'])->name('attendance.checkout');
+
 
         Route::get('/tasks', [\App\Http\Controllers\Portal\TechnicianController::class, 'tasks'])->name('tasks');
         Route::get('/tasks/{task}', [\App\Http\Controllers\Portal\TechnicianController::class, 'showTask'])->name('tasks.show');
@@ -517,3 +528,11 @@ Route::prefix('voucher')->name('voucher.')->group(function () {
     Route::post('/purchase', [VoucherController::class, 'purchase'])->name('purchase');
     Route::get('/success/{id}', [VoucherController::class, 'success'])->name('success');
 });
+
+
+use App\Http\Controllers\MidtransContoller;
+//midtrans webhook
+Route::post(
+    '/midtrans/notification',
+    [MidtransContoller::class, 'notification']
+);

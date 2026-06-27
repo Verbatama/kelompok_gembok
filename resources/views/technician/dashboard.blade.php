@@ -72,16 +72,17 @@
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <a href="{{ route('technician.tasks') }}" class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition text-center">
             <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <i class="fas fa-tasks text-orange-600 text-xl"></i>
+                <!-- <i class="fas fa-tasks text-orange-600 text-xl"></i> -->
+                  <i class="fas fa-plug text-blue-600 text-xl"></i>
             </div>
-            <p class="font-medium text-gray-800">Tugas Saya</p>
+            <p class="font-medium text-gray-800">Pemasangan</p>
         </a>
-        <a href="{{ route('technician.installations') }}" class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition text-center">
+        <!-- <a href="{{ route('technician.installations') }}" class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition text-center">
             <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <i class="fas fa-plug text-blue-600 text-xl"></i>
             </div>
             <p class="font-medium text-gray-800">Instalasi</p>
-        </a>
+        </a> -->
         <a href="{{ route('technician.repairs') }}" class="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition text-center">
             <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <i class="fas fa-wrench text-red-600 text-xl"></i>
@@ -99,7 +100,7 @@
     <!-- Today's Tasks -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100">
         <div class="p-6 border-b border-gray-100 flex justify-between items-center">
-            <h2 class="text-lg font-semibold text-gray-800">Tugas Hari Ini</h2>
+            <h2 class="text-lg font-semibold text-gray  -800">Pemasangan</h2>
             <a href="{{ route('technician.tasks') }}" class="text-orange-600 hover:text-orange-700 text-sm">Lihat Semua</a>
         </div>
         <div class="divide-y divide-gray-100">
@@ -110,8 +111,8 @@
                         <i class="fas {{ $task->type == 'installation' ? 'fa-plug text-blue-600' : 'fa-wrench text-red-600' }}"></i>
                     </div>
                     <div>
-                        <p class="font-medium text-gray-800">{{ $task->customer->name ?? 'N/A' }}</p>
-                        <p class="text-sm text-gray-500">{{ $task->customer->address ?? '' }}</p>
+                        <p class="font-medium text-gray-800">{{ $task->customer_name ?? 'N/A' }}</p>
+                        <p class="text-sm text-gray-500">{{ $task->customer_address ?? '' }}</p>
                     </div>
                 </div>
                 <div class="text-right">
@@ -129,7 +130,7 @@
             @empty
             <div class="p-8 text-center text-gray-500">
                 <i class="fas fa-check-circle text-4xl mb-2 text-green-500"></i>
-                <p>Tidak ada tugas hari ini</p>
+            <p>Tidak ada pemasangan hari ini</p>
             </div>
             @endforelse
         </div>
