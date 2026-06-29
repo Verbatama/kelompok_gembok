@@ -43,32 +43,16 @@
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">No. Aset Internal</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Serial Number (SN)</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Merek</th>
-                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Pengguna / Customer</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Status</th>
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white dark:bg-slate-700 divide-y divide-gray-200 dark:divide-slate-600">
                             @forelse($modems as $modem)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-slate-600 transition">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-semibold text-cyan-600 dark:text-cyan-400">{{ $modem->nomor_aset_internal }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-xs font-mono text-gray-600 dark:text-gray-300">{{ $modem->serial_number }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900 dark:text-white font-medium">{{ $modem->merek }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-600 dark:text-gray-300">
-                                            @if($modem->customer)
-                                                <i class="fas fa-user mr-1 text-xs text-gray-400"></i> {{ $modem->customer->name }}
-                                            @else
-                                                <span class="text-gray-400 dark:text-gray-500 italic">Belum terpakai</span>
-                                            @endif
-                                        </div>
-                                    </td>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{{ $modem->nomor_aset_internal }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{{ $modem->serial_number }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">{{ $modem->merek }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($modem->status === 'stok_gudang')
                                             <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-cyan-100 text-cyan-800 dark:bg-cyan-900/50 dark:text-cyan-400">
@@ -104,7 +88,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                    <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                                         <i class="fas fa-exclamation-circle text-4xl mb-4 text-gray-300 dark:text-slate-500"></i>
                                         <p>Tidak ada data modem perangkat saat ini.</p>
                                     </td>

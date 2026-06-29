@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
             $table->text('address')->nullable();
+            $table->string('ktp_photo')->nullable();
             $table->foreignId('package_id')->nullable()->constrained('packages')->nullOnDelete();
             $table->string('status')->default('active');
             $table->timestamp('join_date')->useCurrent();

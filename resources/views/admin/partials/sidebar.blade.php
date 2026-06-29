@@ -77,6 +77,12 @@
          <i class="fas fa-clipboard-check w-5 mr-3"></i>
         <span>Absensi</span>
         </a>
+
+        <a href="{{ route('admin.attendance.history') }}" 
+   class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.attendance.history') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+    <i class="fas fa-history w-5 mr-3"></i>
+    <span>Riwayat Absensi</span>
+        </a>
         
         <a href="{{ route('admin.agents.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.agents.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
             <i class="fas fa-user-tie w-5 mr-3"></i>
@@ -111,10 +117,43 @@
             <span>Tiang Management</span>
         </a>
 
-        <a href="{{ route('admin.network.modems.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.network.modems.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
-            <i class="fas fa-hdd w-5 mr-3"></i>
-            <span>Modem Management</span>
+        <div x-data="{ openModems: {{ request()->routeIs('admin.network.modems.*') ? 'true' : 'false' }} }">
+    <button @click="openModems = !openModems"
+        class="flex items-center w-full px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.network.modems.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+
+        <i class="fas fa-hdd w-5 mr-3"></i>
+        <span>Modem Management</span>
+
+        <i class="fas fa-chevron-down ml-auto text-xs transition-transform duration-200"
+           :class="openModems ? 'rotate-180' : ''"></i>
+    </button>
+
+    <div x-show="openModems"
+         x-cloak
+         class="mt-1 ml-4 pl-4 border-l border-cyan-500/30 space-y-1">
+
+        <a href="{{ route('admin.network.modems.index') }}"
+           class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">
+            Semua Modem
         </a>
+
+        <a href="{{ route('admin.network.modems.index', ['status' => 'stok_gudang']) }}"
+           class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">
+            Stok Gudang
+        </a>
+
+        <a href="{{ route('admin.network.modems.index', ['status' => 'terpasang']) }}"
+           class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">
+            Terpasang
+        </a>
+
+        <a href="{{ route('admin.network.modems.index', ['status' => 'rusak']) }}"
+           class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg">
+            Rusak
+        </a>
+
+    </div>
+</div>
 
         <a href="{{ route('admin.network.backbones.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.network.backbones.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
             <i class="fas fa-route w-5 mr-3"></i>

@@ -30,4 +30,9 @@ class Technician extends Model
         'join_date' => 'datetime',
         'last_login' => 'datetime',
     ];
+
+    public function attendances()
+{
+    return $this->hasMany(TechnicianAttendance::class);
+}
 }

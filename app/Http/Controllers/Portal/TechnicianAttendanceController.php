@@ -57,10 +57,18 @@ class TechnicianAttendanceController extends Controller
             'status'       => 'required|in:check-in,check-out',
             'latitude'     => 'nullable',
             'longitude'    => 'nullable',
+            
         ]);
 
+        $now = Carbon::now('Asia/Jakarta');
+        $limit = Carbon::today('Asia/Jakarta')->setTime(9, 10, 0);
+
+        $terlambat = $request->status === 'check-in' && $now->greaterThan($limit);
+
         $techId = session('technician_id');
-        $today  = Carbon::today();
+        $today = Carbon::today();
+
+        
 
         // Cegah double check-in / check-out
         $exists = TechnicianAttendance::where('technician_id', $techId)
@@ -97,9 +105,20 @@ class TechnicianAttendanceController extends Controller
             'status'        => $request->status,
             'latitude'      => $request->latitude,
             'longitude'     => $request->longitude,
+            'is_late'       => $terlambat,
         ]);
 
-        $label = $request->status === 'check-in' ? 'Check-in' : 'Check-out';
-        return back()->with('success', $label . ' berhasil dicatat.');
+        
+
+        if ($request->status === 'check-in') {
+
+    if ($terlambat) {
+        return back()->with('warning', 'Check-in berhasil. Anda terlambat (melewati pukul 09.10 WIB).');
+    }
+
+    return back()->with('success', 'Check-in berhasil tepat waktu.');
+}
+
+    return back()->with('success', 'Check-out berhasil.');
     }
 }

@@ -26,7 +26,6 @@ return new class extends Migration
         $table->string('nomor_aset_internal')->unique(); // GL-MDM-2026-001
         $table->string('serial_number')->unique();       // SN Pabrik
         $table->string('merek');                         // Huawei / ZTE
-        $table->foreignId('customer_id')->nullable()->constrained('customers')->nullOnDelete(); 
         $table->enum('status', ['stok_gudang', 'terpasang', 'rusak'])->default('stok_gudang');
         $table->timestamps();
     });

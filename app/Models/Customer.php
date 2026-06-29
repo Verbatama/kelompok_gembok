@@ -16,6 +16,7 @@ class Customer extends Model
         'phone',
         'email',
         'address',
+        'ktp_photo',
         'latitude',
         'longitude',
         'package_id',
@@ -62,5 +63,12 @@ class Customer extends Model
         'username',
         'pppoe_username'
     );
+
+    
+}
+
+    public function housePhotos()
+{
+    return $this->hasMany(CustomerHousePhoto::class);
 }
 }

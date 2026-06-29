@@ -26,7 +26,9 @@
             </div>
 
             <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6 max-w-3xl">
-                <form action="{{ route('admin.customers.store') }}" method="POST">
+                <form action="{{ route('admin.customers.store') }}"
+                 method="POST"
+                 enctype="multipart/form-data">
                     @csrf
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -74,6 +76,46 @@
                                 class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('address') border-red-500 @enderror">{{ old('address') }}</textarea>
                             @error('address')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                         </div>
+
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                     Foto KTP
+                                </label>
+
+                                <input
+                                    type="file"
+                                    name="ktp_photo"
+                                    accept="image/*"
+                                    class="w-full border rounded-lg p-2">
+
+                                    @error('ktp_photo')
+                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                
+                            <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Foto Rumah
+                            </label>
+
+                                <input
+                                    id="house_photos"
+                                    type="file"
+                                   name="house_photos[]"
+                                    multiple
+                                   accept="image/*"
+                                   class="w-full border rounded-lg p-2">
+
+                                <p id="photo-count" class="text-sm text-gray-500 mt-2">
+                                    Belum ada foto dipilih.
+                                  </p>
+
+                                    <div id="photo-preview" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-3"></div>
+
+                                    @error('house_photos.*')
+                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                 @enderror
+                            </div>
 
                         <div>
                             <label for="package_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -141,4 +183,45 @@
         </div>
     </div>
 </div>
+<script>
+const input = document.getElementById('house_photos');
+const preview = document.getElementById('photo-preview');
+const count = document.getElementById('photo-count');
+
+input.addEventListener('change', function () {
+
+    preview.innerHTML = '';
+
+    if (this.files.length === 0) {
+        count.innerHTML = 'Belum ada foto dipilih.';
+        return;
+    }
+
+    count.innerHTML = `Total ${this.files.length} foto dipilih`;
+
+    Array.from(this.files).forEach(file => {
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+
+            preview.innerHTML += `
+                <div class="border rounded-lg p-2 bg-white dark:bg-slate-700">
+                    <img src="${e.target.result}"
+                         class="w-full h-32 object-cover rounded">
+
+                    <p class="text-xs mt-2 break-all text-center">
+                        ${file.name}
+                    </p>
+                </div>
+            `;
+
+        };
+
+        reader.readAsDataURL(file);
+
+    });
+
+});
+</script>
 @endsection

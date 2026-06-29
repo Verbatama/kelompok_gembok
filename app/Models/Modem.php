@@ -11,7 +11,8 @@ class Modem extends Model
         'nomor_aset_internal',
         'serial_number',
         'merek',
-        'customer_id',
         'status',
     ];
+
+    
 }

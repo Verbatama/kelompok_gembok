@@ -22,6 +22,7 @@ return new class extends Migration
          $table->enum('status', ['check-in', 'check-out']);
         $table->decimal('latitude', 10, 7)->nullable();
         $table->decimal('longitude', 10, 7)->nullable();
+        $table->boolean('is_late')->default(false);
 
          $table->timestamps();
 });

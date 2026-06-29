@@ -84,6 +84,52 @@
                 </div>
             </div>
 
+            <div class="mb-6 bg-white dark:bg-slate-700 rounded-xl shadow p-4">
+        <form method="GET" action="{{ route('admin.network.modems.index') }}">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <!-- Search -->
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Cari No Aset, Serial Number, atau Merek..."
+                class="border rounded-lg px-4 py-2 dark:bg-slate-800 dark:border-slate-600 dark:text-white">
+
+            <!-- Dropdown Status -->
+            <select
+                name="status"
+                class="border rounded-lg px-4 py-2 dark:bg-slate-800 dark:border-slate-600 dark:text-white">
+
+                <option value="">Semua Status</option>
+
+                @foreach($statuses as $status)
+                    <option value="{{ $status }}"
+                        {{ request('status') == $status ? 'selected' : '' }}>
+                        {{ ucwords(str_replace('_', ' ', $status)) }}
+                    </option>
+                @endforeach
+
+            </select>
+
+            <!-- Tombol -->
+            <div class="flex gap-2">
+                <button
+                    type="submit"
+                    class="bg-cyan-600 text-white px-5 py-2 rounded-lg hover:bg-cyan-700">
+                    <i class="fas fa-search mr-1"></i> Filter
+                </button>
+
+                <a href="{{ route('admin.network.modems.index') }}"
+                    class="bg-gray-500 text-white px-5 py-2 rounded-lg hover:bg-gray-600">
+                    Reset
+                </a>
+            </div>
+
+        </div>
+    </form>
+</div>
+
             <!-- Packages Table -->
             <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md overflow-hidden">
                 <div class="p-6 border-b border-gray-200 dark:border-slate-600">

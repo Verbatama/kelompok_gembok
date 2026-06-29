@@ -166,7 +166,11 @@
     }
     .flash.err { background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; }
     .flash.ok  { background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; }
-
+    .flash.warning {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
     @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 </style>
 
@@ -183,6 +187,11 @@
 
     @if(session('success'))
         <div class="flash ok" style="display:block;">{{ session('success') }}</div>
+    @endif
+    @if(session('warning'))
+    <div class="flash warning" style="display:block;">
+        {{ session('warning') }}
+    </div>
     @endif
     @if(session('error'))
         <div class="flash err" style="display:block;">{{ session('error') }}</div>

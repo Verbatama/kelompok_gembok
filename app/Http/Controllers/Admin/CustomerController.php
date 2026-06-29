@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Events\CustomerSuspended;
+use App\Models\CustomerHousePhoto;
 use App\Services\MikrotikService;
 use Illuminate\Http\Request;
 use App\Notifications\SystemNotification;
+use Illuminate\Support\Facades\Storage;
 
 
 class CustomerController extends Controller
@@ -58,6 +60,8 @@ class CustomerController extends Controller
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
+            'ktp_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'house_photos.*' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
             'package_id' => 'nullable|exists:packages,id',
             'status' => 'required|in:active,inactive,suspended',
             'pppoe_username' => 'nullable|string|max:255',
@@ -66,9 +70,24 @@ class CustomerController extends Controller
 
         $validated['join_date'] = now();
 
+        if ($request->hasFile('ktp_photo')) {
+        $validated['ktp_photo'] = $request
+        ->file('ktp_photo')
+        ->store('customers/ktp', 'public');
+}
         $customer = \App\Models\Customer::create($validated);
 
-        $users= \App\Models\User::all();
+        if ($request->hasFile('house_photos')) {
+        foreach ($request->file('house_photos') as $photo) {
+
+        $customer->housePhotos()->create([
+            'photo' => $photo->store('customers/houses', 'public'),
+        ]);
+
+    }
+
+}
+         $users= \App\Models\User::all();
          foreach( $users as $user ) {
             $user->notify(
                 new SystemNotification(
@@ -142,6 +161,8 @@ class CustomerController extends Controller
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
+            'ktp_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'house_photos.*' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
             'package_id' => 'nullable|exists:packages,id',
             'status' => 'required|in:active,inactive,suspended',
             'pppoe_username' => 'nullable|string|max:255',
@@ -149,7 +170,29 @@ class CustomerController extends Controller
         ]);
 
         $oldStatus = $customer->status;
+        if ($request->hasFile('ktp_photo')) {
+
+    if ($customer->ktp_photo) {
+        Storage::disk('public')->delete($customer->ktp_photo);
+    }
+
+     $validated['ktp_photo'] = $request
+        ->file('ktp_photo')
+        ->store('customers/ktp', 'public');
+}
         $customer->update($validated);
+
+        if ($request->hasFile('house_photos')) {
+
+    foreach ($request->file('house_photos') as $photo) {
+
+        $customer->housePhotos()->create([
+            'photo' => $photo->store('customers/houses', 'public'),
+        ]);
+
+    }
+
+}
 
         // Fire event if customer is suspended
         if ($oldStatus !== 'suspended' && $validated['status'] === 'suspended') {

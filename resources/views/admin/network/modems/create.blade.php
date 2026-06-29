@@ -71,21 +71,7 @@
                             </select>
                         </div>
 
-                        <div>
-                            <label for="customer_id" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Alokasikan ke Customer (Opsional)</label>
-                            <select name="customer_id" id="customer_id" 
-                                class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500">
-                                <option value="">-- Belum Dialokasikan / Stok Gudang --</option>
-                                @foreach($customers as $customer)
-                                    <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
-                                        {{ $customer->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('customer_id')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+                        
 
                         <div class="pt-4 flex justify-end space-x-3">
                             <button type="reset" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-slate-600 dark:hover:bg-slate-500 text-gray-700 dark:text-gray-200 rounded-lg transition">

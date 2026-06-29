@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\TiketGangguanController;
 use App\Http\Controllers\Portal\TechnicianAttendanceController;
 use App\Http\Controllers\Admin\AdminAttendanceController;
+use App\Http\Controllers\Admin\AttendanceHistoryController;
 
 
 
@@ -67,6 +68,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         //ABSENSI
         Route::get('/attendance', [AdminAttendanceController::class, 'index']) ->name('attendance.index');
         Route::post('/attendance', [AdminAttendanceController::class, 'store'])->name('attendance.store');
+        //riwayat absen teknisi
+        Route::get('/attendance-history', [AttendanceHistoryController::class, 'index'])
+        ->name('attendance.history');
 
         // Customer Management
         Route::resource('customers', CustomerController::class);

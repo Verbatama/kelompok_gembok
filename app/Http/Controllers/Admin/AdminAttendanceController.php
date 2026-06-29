@@ -45,6 +45,11 @@ class AdminAttendanceController extends Controller
             'longitude'    => 'nullable',
         ]);
 
+        $now = Carbon::now('Asia/Jakarta');
+       $limit = Carbon::today('Asia/Jakarta')->setTime(9, 10, 0);
+
+       $terlambat = $request->status === 'check-in' && $now->greaterThan($limit);
+
         // Cegah double check-in / double check-out di hari yang sama
         $today  = Carbon::today();
         $exists = AdminAttendance::where('user_id', auth()->id())
@@ -84,7 +89,15 @@ class AdminAttendanceController extends Controller
             'longitude'    => $request->longitude,
         ]);
 
-        $label = $request->status === 'check-in' ? 'Check-in' : 'Check-out';
-        return back()->with('success', $label . ' berhasil dicatat.');
+        if ($request->status === 'check-in') {
+
+    if ($terlambat) {
+        return back()->with('warning', 'Check-in berhasil. Anda terlambat (melewati pukul 09.10 WIB).');
+    }
+
+        return back()->with('success', 'Check-in berhasil tepat waktu.');
+}
+
+        return back()->with('success', 'Check-out berhasil.');
     }
 }
