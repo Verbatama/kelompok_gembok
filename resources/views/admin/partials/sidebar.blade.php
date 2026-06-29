@@ -71,6 +71,12 @@
             <i class="fas fa-hand-holding-usd w-5 mr-3"></i>
             <span>Collectors</span>
         </a>
+
+        <a href="{{ route('admin.attendance.index') }}" 
+        class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.attendance.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
+         <i class="fas fa-clipboard-check w-5 mr-3"></i>
+        <span>Absensi</span>
+        </a>
         
         <a href="{{ route('admin.agents.index') }}" class="flex items-center px-4 py-2.5 text-gray-300 hover:bg-white hover:bg-opacity-10 rounded-lg transition {{ request()->routeIs('admin.agents.*') ? 'bg-white bg-opacity-20 text-white' : '' }}">
             <i class="fas fa-user-tie w-5 mr-3"></i>

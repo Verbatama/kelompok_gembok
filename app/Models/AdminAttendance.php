@@ -4,15 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Attendance extends Model
+class AdminAttendance extends Model
 {
-    protected $table = 'attendances';
-
     protected $fillable = [
-        'nama',
+        'user_id',
         'image_selfie',
+        'status',
         'latitude',
         'longitude',
-        'status',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

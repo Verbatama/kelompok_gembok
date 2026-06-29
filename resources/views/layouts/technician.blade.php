@@ -40,15 +40,20 @@
                 <i class="fas fa-home w-5 mr-3"></i>
                 <span>Dashboard</span>
             </a>
+            <a href="{{ route('technician.attendance.index') }}"
+                class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.attendance.index') ? 'bg-slate-700 text-white' : '' }}">
+                <i class="fas fa-clipboard-check w-5 mr-3"></i>
+                <span>Absensi</span>
+            </a>
             <a href="{{ route('technician.tasks') }}"
                 class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.tasks*') ? 'bg-slate-700 text-white' : '' }}">
                 <i class="fas fa-plug w-5 mr-3"></i>
                 <span>Daftar Pemasangan</span>
             </a>
-            <!-- <a href="{{ route('technician.installations') }}" class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.installations*') ? 'bg-slate-700 text-white' : '' }}">
+            <a href="{{ route('technician.installations') }}" class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.installations*') ? 'bg-slate-700 text-white' : '' }}">
                 <i class="fas fa-plug w-5 mr-3"></i>
                 <span>Instalasi</span>
-            </a> -->
+            </a>
             <a href="{{ route('technician.repairs') }}"
                 class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.repairs*') ? 'bg-slate-700 text-white' : '' }}">
                 <i class="fas fa-wrench w-5 mr-3"></i>

@@ -24,7 +24,7 @@ class TechnicianController extends Controller
             ->first();
 
         if ($technician && Hash::check($request->password, $technician->password)) {
-            Auth::loginUsingId($technician->user_id ?? $technician->id);
+            
             session(['technician_id' => $technician->id]);
             return redirect()->route('technician.dashboard');
         }
@@ -35,7 +35,7 @@ class TechnicianController extends Controller
     public function logout()
     {
         session()->forget('technician_id');
-        Auth::logout();
+        
         return redirect()->route('technician.login');
     }
 

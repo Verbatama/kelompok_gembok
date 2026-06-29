@@ -14,13 +14,9 @@ use App\Http\Controllers\Admin\OdpController;
 use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\TiketGangguanController;
-use App\Http\Controllers\AttendancesController;
+use App\Http\Controllers\Portal\TechnicianAttendanceController;
+use App\Http\Controllers\Admin\AdminAttendanceController;
 
-// Halaman utama absensi umum
-Route::get('/absensi', [AttendancesController::class, 'index'])->name('attendance.index');
-
-// Proses simpan absen masuk
-Route::post('/absensi/store', [AttendancesController::class, 'store'])->name('absensi.store');
 
 
 
@@ -68,6 +64,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+        //ABSENSI
+        Route::get('/attendance', [AdminAttendanceController::class, 'index']) ->name('attendance.index');
+        Route::post('/attendance', [AdminAttendanceController::class, 'store'])->name('attendance.store');
+
         // Customer Management
         Route::resource('customers', CustomerController::class);
         Route::get('/customers/{customer}/invoices', [CustomerController::class, 'invoices'])->name('customers.invoices');
@@ -86,11 +86,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Technician Management
         Route::resource('technicians', TechnicianController::class);
 
-        // Gaji Management
-        Route::resource('overtimes', \App\Http\Controllers\Admin\OvertimeController::class);
-        Route::get('payrolls', [\App\Http\Controllers\Admin\PayrollController::class, 'index'])->name('payrolls.index');
-        Route::post('payrolls/generate', [\App\Http\Controllers\Admin\PayrollController::class, 'generate'])->name('payrolls.generate');
-        Route::post('payrolls/{payroll}/pay', [\App\Http\Controllers\Admin\PayrollController::class, 'pay'])->name('payrolls.pay');
+        
 
         // Collector Management
         Route::resource('collectors', CollectorController::class);
@@ -474,10 +470,13 @@ Route::prefix('technician')->name('technician.')->group(function () {
     })->name('login');
     Route::post('/login', [\App\Http\Controllers\Portal\TechnicianController::class, 'login'])->name('login.post');
 
-    Route::middleware(['auth'])->group(function () {
+    
         Route::get('/dashboard', [\App\Http\Controllers\Portal\TechnicianController::class, 'dashboard'])->name('dashboard');
         Route::post('/logout', [\App\Http\Controllers\Portal\TechnicianController::class, 'logout'])->name('logout');
 
+        Route::get('/attendance', [\App\Http\Controllers\Portal\TechnicianAttendanceController::class, 'index'])->name('attendance.index');
+        Route::post('/attendance', [\App\Http\Controllers\Portal\TechnicianAttendanceController::class, 'store'])
+        ->name('attendance.store');
 
 
         Route::get('/tasks', [\App\Http\Controllers\Portal\TechnicianController::class, 'tasks'])->name('tasks');
@@ -488,7 +487,7 @@ Route::prefix('technician')->name('technician.')->group(function () {
         Route::get('/map', [\App\Http\Controllers\Portal\TechnicianController::class, 'map'])->name('map');
         Route::get('/profile', [\App\Http\Controllers\Portal\TechnicianController::class, 'profile'])->name('profile');
     });
-});
+
 
 
 // ============================================================
