@@ -13,16 +13,16 @@ return new class extends Migration {
         Schema::create('technician_attendances', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('technician_id')
+            $table
+                ->foreignId('technician_id')
                 ->constrained('technicians')
                 ->cascadeOnDelete();
-
+            $table->date('attendance_date');
             $table->string('image_selfie')->nullable();
             $table->enum('status', ['check-in', 'check-out', 'absent']);
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
             $table->boolean('is_late')->default(false);
-            
 
             $table->timestamps();
         });

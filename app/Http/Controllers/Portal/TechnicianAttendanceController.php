@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
-use App\Models\TechnicianAttendance;
 use App\Models\Technician;
+use App\Models\TechnicianAttendance;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
-
 
 class TechnicianAttendanceController extends Controller
 {
@@ -20,29 +19,34 @@ class TechnicianAttendanceController extends Controller
         }
 
         $techId = session('technician_id');
-        $technician = Technician::find($techId);
-        $today  = Carbon::today();
+        $technician = Technician::findOrFail($techId);
+        $today = Carbon::today('Asia/Jakarta');
 
         $records = TechnicianAttendance::where('technician_id', $techId)
-            ->whereDate('created_at', $today)
+            ->whereDate('attendance_date', $today)
             ->orderBy('created_at')
             ->get();
 
-        $checkInRecord  = $records->firstWhere('status', 'check-in');
+        $checkInRecord = $records->firstWhere('status', 'check-in');
         $checkOutRecord = $records->firstWhere('status', 'check-out');
 
-        $sudahCheckin  = (bool) $checkInRecord;
+        $sudahCheckin = (bool) $checkInRecord;
         $sudahCheckout = (bool) $checkOutRecord;
 
-        $jamMasuk  = $checkInRecord
+        $jamMasuk = $checkInRecord
             ? Carbon::parse($checkInRecord->created_at)->format('H:i')
             : null;
+
         $jamKeluar = $checkOutRecord
             ? Carbon::parse($checkOutRecord->created_at)->format('H:i')
             : null;
 
         return view('technician.attendance.index', compact(
-            'technician', 'sudahCheckin', 'sudahCheckout', 'jamMasuk', 'jamKeluar'
+            'technician',
+            'sudahCheckin',
+            'sudahCheckout',
+            'jamMasuk',
+            'jamKeluar'
         ));
     }
 
@@ -54,26 +58,25 @@ class TechnicianAttendanceController extends Controller
 
         $request->validate([
             'image_selfie' => 'required',
-            'status'       => 'required|in:check-in,check-out',
-            'latitude'     => 'nullable',
-            'longitude'    => 'nullable',
-            
+            'status' => 'required|in:check-in,check-out',
+            'latitude' => 'nullable',
+            'longitude' => 'nullable',
         ]);
 
+        $techId = session('technician_id');
+
         $now = Carbon::now('Asia/Jakarta');
+        $today = Carbon::today('Asia/Jakarta');
+
+        // Batas terlambat
         $limit = Carbon::today('Asia/Jakarta')->setTime(9, 10, 0);
 
         $terlambat = $request->status === 'check-in' && $now->greaterThan($limit);
 
-        $techId = session('technician_id');
-        $today = Carbon::today();
-
-        
-
         // Cegah double check-in / check-out
         $exists = TechnicianAttendance::where('technician_id', $techId)
             ->where('status', $request->status)
-            ->whereDate('created_at', $today)
+            ->whereDate('attendance_date', $today)
             ->exists();
 
         if ($exists) {
@@ -84,7 +87,7 @@ class TechnicianAttendanceController extends Controller
         if ($request->status === 'check-out') {
             $checkedIn = TechnicianAttendance::where('technician_id', $techId)
                 ->where('status', 'check-in')
-                ->whereDate('created_at', $today)
+                ->whereDate('attendance_date', $today)
                 ->exists();
 
             if (!$checkedIn) {
@@ -92,33 +95,46 @@ class TechnicianAttendanceController extends Controller
             }
         }
 
-        $image    = $request->image_selfie;
-        $image    = str_replace('data:image/jpeg;base64,', '', $image);
-        $image    = str_replace(' ', '+', $image);
+        // Simpan selfie
+        $image = $request->image_selfie;
+        $image = str_replace('data:image/jpeg;base64,', '', $image);
+        $image = str_replace(' ', '+', $image);
+
         $filename = 'technician_' . Str::uuid() . '.jpg';
 
-        Storage::disk('public')->put('attendances/' . $filename, base64_decode($image));
+        Storage::disk('public')->put(
+            'attendances/' . $filename,
+            base64_decode($image)
+        );
 
+        // Simpan absensi
         TechnicianAttendance::create([
             'technician_id' => $techId,
-            'image_selfie'  => 'attendances/' . $filename,
-            'status'        => $request->status,
-            'latitude'      => $request->latitude,
-            'longitude'     => $request->longitude,
-            'is_late'       => $terlambat,
+            'attendance_date' => $today,
+            'image_selfie' => 'attendances/' . $filename,
+            'status' => $request->status,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'is_late' => $terlambat,
         ]);
 
-        
-
         if ($request->status === 'check-in') {
+            if ($terlambat) {
+                return back()->with(
+                    'warning',
+                    'Check-in berhasil. Anda terlambat (melewati pukul 09.10 WIB).'
+                );
+            }
 
-    if ($terlambat) {
-        return back()->with('warning', 'Check-in berhasil. Anda terlambat (melewati pukul 09.10 WIB).');
-    }
+            return back()->with(
+                'success',
+                'Check-in berhasil tepat waktu.'
+            );
+        }
 
-    return back()->with('success', 'Check-in berhasil tepat waktu.');
-}
-
-    return back()->with('success', 'Check-out berhasil.');
+        return back()->with(
+            'success',
+            'Check-out berhasil.'
+        );
     }
 }

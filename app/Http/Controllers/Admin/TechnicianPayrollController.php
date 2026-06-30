@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Technician;
 use App\Models\TechnicianAttendance;
 use App\Models\TechnicianPayrolls;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class TechnicianPayrollController extends Controller
@@ -42,15 +43,12 @@ class TechnicianPayrollController extends Controller
             'technician_id' => 'required|exists:technicians,id',
             'bulan' => 'required|integer|min:1|max:12',
             'tahun' => 'required|integer|min:2024',
-
-            // tarif per kejadian
             'denda_telat' => 'required|numeric|min:0',
             'denda_absen' => 'required|numeric|min:0',
-
             'bonus' => 'required|numeric|min:0',
         ]);
 
-        // Payroll sudah ada?
+        // Cek payroll sudah ada
         $exists = TechnicianPayrolls::where('technician_id', $validated['technician_id'])
             ->where('bulan', $validated['bulan'])
             ->where('tahun', $validated['tahun'])
@@ -64,64 +62,72 @@ class TechnicianPayrollController extends Controller
                 ->withInput();
         }
 
-        // Teknisi
+        // Data teknisi
         $technician = Technician::findOrFail($validated['technician_id']);
 
         // Query absensi
         $attendance = TechnicianAttendance::where('technician_id', $technician->id)
-            ->whereMonth('created_at', $validated['bulan'])
-            ->whereYear('created_at', $validated['tahun']);
+            ->whereMonth('attendance_date', $validated['bulan'])
+            ->whereYear('attendance_date', $validated['tahun']);
 
-        // Hitung telat
+        // Jumlah hari dalam bulan
+        $jumlahHari = Carbon::create(
+            $validated['tahun'],
+            $validated['bulan'],
+            1
+        )->daysInMonth;
+
+        // Hari masuk
+        $jumlahMasuk = (clone $attendance)
+            ->where('status', 'check-in')
+            ->count();
+
+        // Hari absen
+        $jumlahAbsen = (clone $attendance)
+            ->where('status', 'absent')
+            ->count();
+
+        // Jumlah telat
         $jumlahTelat = (clone $attendance)
+            ->where('status', 'check-in')
             ->where('is_late', true)
             ->count();
 
-        // Hitung absen
-        $jumlahAbsen = (clone $attendance)
-            ->where('absent', true)
-            ->count();
+        // // Gaji harian
+        // $gajiHarian = $technician->gaji_pokok / $jumlahHari;
 
-        // Snapshot
+        // Gaji sesuai jumlah hadir
+        // $gajiPokok = round($jumlahMasuk * $gajiHarian);
         $gajiPokok = $technician->gaji_pokok;
-
         // Total potongan
         $totalPotongan =
-            ($jumlahTelat * $validated['denda_telat']) +
-            ($jumlahAbsen * $validated['denda_absen']);
+            ($jumlahTelat * $validated['denda_telat'])
+            + ($jumlahAbsen * $validated['denda_absen']);
 
         // Total diterima
         $totalDiterima =
-            $gajiPokok +
-            $validated['bonus'] -
-            $totalPotongan;
+            $gajiPokok
+            + $validated['bonus']
+            - $totalPotongan;
 
         TechnicianPayrolls::create([
             'technician_id' => $technician->id,
-
             'bulan' => $validated['bulan'],
             'tahun' => $validated['tahun'],
-
             'gaji_pokok' => $gajiPokok,
-
             'jumlah_telat' => $jumlahTelat,
             'jumlah_absen' => $jumlahAbsen,
-
-            // tarif
             'denda_telat' => $validated['denda_telat'],
             'denda_absen' => $validated['denda_absen'],
-
             'bonus' => $validated['bonus'],
-
             'total_potongan' => $totalPotongan,
             'total_diterima' => $totalDiterima,
-
             'status' => 'draft',
             'processed_at' => now(),
         ]);
 
         return redirect()
-            ->route('payroll.index')
+            ->route('admin.payroll.index')
             ->with('success', 'Payroll berhasil dibuat.');
     }
 
@@ -155,14 +161,14 @@ class TechnicianPayrollController extends Controller
 
         // Hitung ulang total potongan
         $totalPotongan =
-            ($technicianPayroll->jumlah_telat * $validated['denda_telat']) +
-            ($technicianPayroll->jumlah_absen * $validated['denda_absen']);
+            ($technicianPayroll->jumlah_telat * $validated['denda_telat'])
+            + ($technicianPayroll->jumlah_absen * $validated['denda_absen']);
 
         // Hitung ulang total diterima
         $totalDiterima =
-            $technicianPayroll->gaji_pokok +
-            $validated['bonus'] -
-            $totalPotongan;
+            $technicianPayroll->gaji_pokok
+            + $validated['bonus']
+            - $totalPotongan;
 
         $technicianPayroll->update([
             'denda_telat' => $validated['denda_telat'],
@@ -174,7 +180,7 @@ class TechnicianPayrollController extends Controller
         ]);
 
         return redirect()
-            ->route('payroll.index')
+            ->route('admin.payroll.index')
             ->with('success', 'Payroll berhasil diperbarui.');
     }
 
@@ -186,35 +192,36 @@ class TechnicianPayrollController extends Controller
         $technicianPayroll->delete();
 
         return redirect()
-            ->route('payroll.index')
+            ->route('admin.payroll.index')
             ->with('success', 'Payroll berhasil dihapus.');
     }
+
     public function attendanceSummary(Request $request)
-{
-    $request->validate([
-        'technician_id' => 'required|exists:technicians,id',
-        'bulan' => 'required|integer|min:1|max:12',
-        'tahun' => 'required|integer',
-    ]);
+    {
+        $request->validate([
+            'technician_id' => 'required|exists:technicians,id',
+            'bulan' => 'required|integer|min:1|max:12',
+            'tahun' => 'required|integer',
+        ]);
 
-    $technician = Technician::findOrFail($request->technician_id);
+        $technician = Technician::findOrFail($request->technician_id);
 
-    $attendance = TechnicianAttendance::where('technician_id', $technician->id)
-        ->whereMonth('created_at', $request->bulan)
-        ->whereYear('created_at', $request->tahun);
+        $attendance = TechnicianAttendance::where('technician_id', $technician->id)
+            ->whereMonth('created_at', $request->bulan)
+            ->whereYear('created_at', $request->tahun);
 
-    $jumlahTelat = (clone $attendance)
-        ->where('is_late', true)
-        ->count();
+        $jumlahTelat = (clone $attendance)
+            ->where('is_late', true)
+            ->count();
 
-    $jumlahAbsen = (clone $attendance)
-        ->where('absent', true)
-        ->count();
+        $jumlahAbsen = (clone $attendance)
+            ->where('absent', true)
+            ->count();
 
-    return response()->json([
-        'gaji_pokok' => $technician->gaji_pokok,
-        'jumlah_telat' => $jumlahTelat,
-        'jumlah_absen' => $jumlahAbsen,
-    ]);
-}
+        return response()->json([
+            'gaji_pokok' => $technician->gaji_pokok,
+            'jumlah_telat' => $jumlahTelat,
+            'jumlah_absen' => $jumlahAbsen,
+        ]);
+    }
 }

@@ -3,8 +3,7 @@
 @section('title', 'Riwayat Absensi Teknisi')
 
 @section('content')
-<div class="min-h-screen bg-gray-100 dark:bg-slate-800 transition-colors duration-300"
-     x-data="{
+<div class="min-h-screen bg-gray-100 dark:bg-slate-800 transition-colors duration-300" x-data="{
          sidebarOpen: false,
          isDark: localStorage.getItem('theme') === 'dark',
          toggleTheme() {
@@ -53,14 +52,11 @@
                 <form method="GET" action="{{ route('admin.attendance.history') }}" class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tanggal</label>
-                        <input type="date" name="date"
-                            value="{{ request('date', now()->toDateString()) }}"
-                            class="w-full rounded-lg border border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-600 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <input type="date" name="date" value="{{ request('date', now()->toDateString()) }}" class="w-full rounded-lg border border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-600 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Keterlambatan</label>
-                        <select name="is_late"
-                            class="w-full rounded-lg border border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-600 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <select name="is_late" class="w-full rounded-lg border border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-600 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500">
                             <option value="">Semua</option>
                             <option value="1" {{ request('is_late') == '1' ? 'selected' : '' }}>Terlambat</option>
                             <option value="0" {{ request('is_late') == '0' ? 'selected' : '' }}>Tepat Waktu</option>
@@ -68,18 +64,13 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cari Teknisi</label>
-                        <input type="text" name="search"
-                            value="{{ request('search') }}"
-                            placeholder="Nama teknisi..."
-                            class="w-full rounded-lg border border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-600 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Nama teknisi..." class="w-full rounded-lg border border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-600 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500">
                     </div>
                     <div class="flex items-end gap-2">
-                        <button type="submit"
-                            class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                        <button type="submit" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
                             <i class="fas fa-search mr-1"></i> Filter
                         </button>
-                        <a href="{{ route('admin.attendance.history') }}"
-                            class="flex-1 text-center bg-gray-200 hover:bg-gray-300 dark:bg-slate-600 dark:hover:bg-slate-500 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition">
+                        <a href="{{ route('admin.attendance.history') }}" class="flex-1 text-center bg-gray-200 hover:bg-gray-300 dark:bg-slate-600 dark:hover:bg-slate-500 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition">
                             Reset
                         </a>
                     </div>
@@ -117,14 +108,17 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    @if ($history->status === 'check-in')
-                                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-400">
-                                            <i class="fas fa-sign-in-alt mr-1"></i> Check-In
-                                        </span>
+
+                                    @if($history->status === 'absent')<span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-black text-white">
+                                        <i class="fas fa-sign-out-alt mr-1"></i> Absent
+                                    </span @elseif ($history->status === 'check-in')
+                                    <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-400">
+                                        <i class="fas fa-sign-in-alt mr-1"></i> Check-In
+                                    </span>
                                     @else
-                                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-400">
-                                            <i class="fas fa-sign-out-alt mr-1"></i> Check-Out
-                                        </span>
+                                    <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-400">
+                                        <i class="fas fa-sign-out-alt mr-1"></i> Check-Out
+                                    </span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-800 dark:text-gray-200 whitespace-nowrap">
@@ -133,28 +127,26 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     @if ($history->status === 'check-in')
-                                        @if ($history->is_late)
-                                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-400">
-                                                <i class="fas fa-exclamation-circle mr-1"></i> Terlambat
-                                            </span>
-                                        @else
-                                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-400">
-                                                <i class="fas fa-check-circle mr-1"></i> Tepat Waktu
-                                            </span>
-                                        @endif
+                                    @if ($history->is_late)
+                                    <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-400">
+                                        <i class="fas fa-exclamation-circle mr-1"></i> Terlambat
+                                    </span>
                                     @else
-                                        <span class="text-gray-400 dark:text-gray-500 text-xs">-</span>
+                                    <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-400">
+                                        <i class="fas fa-check-circle mr-1"></i> Tepat Waktu
+                                    </span>
+                                    @endif
+                                    @else
+                                    <span class="text-gray-400 dark:text-gray-500 text-xs">-</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4">
                                     @if ($history->latitude && $history->longitude)
-                                        <a href="https://maps.google.com/?q={{ $history->latitude }},{{ $history->longitude }}"
-                                            target="_blank"
-                                            class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg bg-cyan-50 text-cyan-700 hover:bg-cyan-100 dark:bg-cyan-900/30 dark:text-cyan-400 dark:hover:bg-cyan-900/50 transition">
-                                            <i class="fas fa-map-marker-alt mr-1"></i> Lihat Peta
-                                        </a>
+                                    <a href="https://maps.google.com/?q={{ $history->latitude }},{{ $history->longitude }}" target="_blank" class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg bg-cyan-50 text-cyan-700 hover:bg-cyan-100 dark:bg-cyan-900/30 dark:text-cyan-400 dark:hover:bg-cyan-900/50 transition">
+                                        <i class="fas fa-map-marker-alt mr-1"></i> Lihat Peta
+                                    </a>
                                     @else
-                                        <span class="text-gray-400 dark:text-gray-500 text-xs">-</span>
+                                    <span class="text-gray-400 dark:text-gray-500 text-xs">-</span>
                                     @endif
                                 </td>
                             </tr>

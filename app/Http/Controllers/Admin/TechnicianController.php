@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class TechnicianController extends Controller
 {
@@ -14,7 +15,8 @@ class TechnicianController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
+                $q
+                    ->where('name', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
             });
@@ -41,21 +43,23 @@ class TechnicianController extends Controller
             'phone' => 'nullable|string|max:20|unique:technicians,phone',
             'email' => 'nullable|email|max:255',
             'role' => 'required|in:technician,supervisor,installer',
-            'gaji_pokok'=>'required|int|min:0',
+            'username' => 'required|string|max:225',
+            'password' => 'required|string|min:8',
+            'gaji_pokok' => 'required|integer|min:0',
             'notes' => 'nullable|string',
             'area_coverage' => 'nullable|string',
             'whatsapp_group_id' => 'nullable|string',
         ]);
 
+        $validated['password'] = Hash::make($validated['password']);
         $validated['is_active'] = true;
         $validated['join_date'] = now();
-        $validated['password'] = \Illuminate\Support\Facades\Hash::make('password');
-        $validated['username'] = $request->email ? explode('@', $request->email)[0] : strtolower(str_replace(' ', '', $request->name));
 
         \App\Models\Technician::create($validated);
 
-        return redirect()->route('admin.technicians.index')
-            ->with('success', 'Technician created successfully! Default password is: password');
+        return redirect()
+            ->route('admin.technicians.index')
+            ->with('success', 'Technician created successfully!');
     }
 
     public function show(\App\Models\Technician $technician)
@@ -86,7 +90,8 @@ class TechnicianController extends Controller
 
         $technician->update($validated);
 
-        return redirect()->route('admin.technicians.index')
+        return redirect()
+            ->route('admin.technicians.index')
             ->with('success', 'Technician updated successfully!');
     }
 
@@ -94,7 +99,8 @@ class TechnicianController extends Controller
     {
         $technician->delete();
 
-        return redirect()->route('admin.technicians.index')
+        return redirect()
+            ->route('admin.technicians.index')
             ->with('success', 'Technician deleted successfully!');
     }
 }

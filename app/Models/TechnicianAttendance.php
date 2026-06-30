@@ -10,6 +10,7 @@ class TechnicianAttendance extends Model
         'technician_id',
         'image_selfie',
         'status',
+        'attendance_date',
         'latitude',
         'longitude',
         'is_late',
