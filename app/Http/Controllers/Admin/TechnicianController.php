@@ -13,10 +13,10 @@ class TechnicianController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -41,6 +41,7 @@ class TechnicianController extends Controller
             'phone' => 'nullable|string|max:20|unique:technicians,phone',
             'email' => 'nullable|email|max:255',
             'role' => 'required|in:technician,supervisor,installer',
+            'gaji_pokok'=>'required|int|min:0',
             'notes' => 'nullable|string',
             'area_coverage' => 'nullable|string',
             'whatsapp_group_id' => 'nullable|string',
@@ -76,6 +77,7 @@ class TechnicianController extends Controller
             'role' => 'required|in:technician,supervisor,installer',
             'notes' => 'nullable|string',
             'area_coverage' => 'nullable|string',
+            'gaji_pokok' => 'required|integer|min:0',
             'whatsapp_group_id' => 'nullable|string',
             'is_active' => 'nullable|in:0,1',
         ]);

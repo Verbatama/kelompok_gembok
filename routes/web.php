@@ -66,11 +66,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         //ABSENSI
-        Route::get('/attendance', [AdminAttendanceController::class, 'index']) ->name('attendance.index');
+        Route::get('/attendance', [AdminAttendanceController::class, 'index'])->name('attendance.index');
         Route::post('/attendance', [AdminAttendanceController::class, 'store'])->name('attendance.store');
         //riwayat absen teknisi
         Route::get('/attendance-history', [AttendanceHistoryController::class, 'index'])
-        ->name('attendance.history');
+            ->name('attendance.history');
 
         // Customer Management
         Route::resource('customers', CustomerController::class);
@@ -90,7 +90,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Technician Management
         Route::resource('technicians', TechnicianController::class);
 
-        
+
 
         // Collector Management
         Route::resource('collectors', CollectorController::class);
@@ -416,7 +416,28 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/database/export/download', [\App\Http\Controllers\Admin\CustomerExportController::class, 'export'])->name('database.export.download');
 
         Route::get('/ppoe-monitoring', [\App\Http\Controllers\Admin\PPOEMonitoringController::class, 'index']);
+        // Payroll
+        // Payroll
+        Route::get('/payroll', [\App\Http\Controllers\Admin\TechnicianPayrollController::class, 'index'])
+            ->name('payroll.index');
 
+        Route::get('/payroll/create', [\App\Http\Controllers\Admin\TechnicianPayrollController::class, 'create'])
+            ->name('payroll.create');
+
+        Route::post('/payroll', [\App\Http\Controllers\Admin\TechnicianPayrollController::class, 'store'])
+            ->name('payroll.store');
+
+        Route::get('/payroll/{technicianPayroll}', [\App\Http\Controllers\Admin\TechnicianPayrollController::class, 'show'])
+            ->name('payroll.show');
+
+        Route::get('/payroll/{technicianPayroll}/edit', [\App\Http\Controllers\Admin\TechnicianPayrollController::class, 'edit'])
+            ->name('payroll.edit');
+
+        Route::put('/payroll/{technicianPayroll}', [\App\Http\Controllers\Admin\TechnicianPayrollController::class, 'update'])
+            ->name('payroll.update');
+
+        Route::delete('/payroll/{technicianPayroll}', [\App\Http\Controllers\Admin\TechnicianPayrollController::class, 'destroy'])
+            ->name('payroll.destroy');
     });
 });
 
@@ -474,23 +495,23 @@ Route::prefix('technician')->name('technician.')->group(function () {
     })->name('login');
     Route::post('/login', [\App\Http\Controllers\Portal\TechnicianController::class, 'login'])->name('login.post');
 
-    
-        Route::get('/dashboard', [\App\Http\Controllers\Portal\TechnicianController::class, 'dashboard'])->name('dashboard');
-        Route::post('/logout', [\App\Http\Controllers\Portal\TechnicianController::class, 'logout'])->name('logout');
 
-        Route::get('/attendance', [\App\Http\Controllers\Portal\TechnicianAttendanceController::class, 'index'])->name('attendance.index');
-        Route::post('/attendance', [\App\Http\Controllers\Portal\TechnicianAttendanceController::class, 'store'])
+    Route::get('/dashboard', [\App\Http\Controllers\Portal\TechnicianController::class, 'dashboard'])->name('dashboard');
+    Route::post('/logout', [\App\Http\Controllers\Portal\TechnicianController::class, 'logout'])->name('logout');
+
+    Route::get('/attendance', [\App\Http\Controllers\Portal\TechnicianAttendanceController::class, 'index'])->name('attendance.index');
+    Route::post('/attendance', [\App\Http\Controllers\Portal\TechnicianAttendanceController::class, 'store'])
         ->name('attendance.store');
 
 
-        Route::get('/tasks', [\App\Http\Controllers\Portal\TechnicianController::class, 'tasks'])->name('tasks');
-        Route::get('/tasks/{task}', [\App\Http\Controllers\Portal\TechnicianController::class, 'showTask'])->name('tasks.show');
-        Route::post('/tasks/{task}/update', [\App\Http\Controllers\Portal\TechnicianController::class, 'updateTask'])->name('tasks.update');
-        Route::get('/installations', [\App\Http\Controllers\Portal\TechnicianController::class, 'installations'])->name('installations');
-        Route::get('/repairs', [\App\Http\Controllers\Portal\TechnicianController::class, 'repairs'])->name('repairs');
-        Route::get('/map', [\App\Http\Controllers\Portal\TechnicianController::class, 'map'])->name('map');
-        Route::get('/profile', [\App\Http\Controllers\Portal\TechnicianController::class, 'profile'])->name('profile');
-    });
+    Route::get('/tasks', [\App\Http\Controllers\Portal\TechnicianController::class, 'tasks'])->name('tasks');
+    Route::get('/tasks/{task}', [\App\Http\Controllers\Portal\TechnicianController::class, 'showTask'])->name('tasks.show');
+    Route::post('/tasks/{task}/update', [\App\Http\Controllers\Portal\TechnicianController::class, 'updateTask'])->name('tasks.update');
+    Route::get('/installations', [\App\Http\Controllers\Portal\TechnicianController::class, 'installations'])->name('installations');
+    Route::get('/repairs', [\App\Http\Controllers\Portal\TechnicianController::class, 'repairs'])->name('repairs');
+    Route::get('/map', [\App\Http\Controllers\Portal\TechnicianController::class, 'map'])->name('map');
+    Route::get('/profile', [\App\Http\Controllers\Portal\TechnicianController::class, 'profile'])->name('profile');
+});
 
 
 

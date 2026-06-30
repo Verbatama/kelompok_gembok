@@ -16,6 +16,7 @@ class Technician extends Model
         'notes',
         'is_active',
         'area_coverage',
+        'gaji_pokok',
         'join_date',
         'last_login',
         'whatsapp_group_id',
@@ -32,7 +33,12 @@ class Technician extends Model
     ];
 
     public function attendances()
-{
-    return $this->hasMany(TechnicianAttendance::class);
-}
+    {
+        return $this->hasMany(TechnicianAttendance::class);
+    }
+
+    public function payrolls()
+    {
+        return $this->hasMany(TechnicianPayrolls::class);
+    }
 }

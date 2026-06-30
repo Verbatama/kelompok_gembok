@@ -13,6 +13,7 @@ class TechnicianAttendance extends Model
         'latitude',
         'longitude',
         'is_late',
+        'absent'
     ];
 
     public function technician()

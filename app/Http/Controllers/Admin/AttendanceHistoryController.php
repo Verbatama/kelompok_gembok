@@ -7,21 +7,46 @@ use App\Models\TechnicianAttendance;
 
 class AttendanceHistoryController extends Controller
 {
- public function index()
-{
-    $histories = TechnicianAttendance::with('technician')
-        ->latest()
-        ->paginate(20);
+    public function index()
+    {
+        $histories = TechnicianAttendance::with('technician')
 
-    $totalTepat = TechnicianAttendance::where('is_late', false)->count();
+            // filter tanggal
+            ->when(request('date'), function ($query) {
+                $query->whereDate('created_at', request('date'));
+            })
 
-    $totalTerlambat = TechnicianAttendance::where('is_late', true)->count();
+            // filter terlambat / tepat waktu
+            ->when(request('is_late') !== null && request('is_late') !== '', function ($query) {
+                $query->where('is_late', request('is_late'));
+            })
 
-    return view('admin.attendance.history', compact(
-        'histories',
-        'totalTepat',
-        'totalTerlambat'
-    ));
-}
+            // filter nama teknisi
+            ->when(request('search'), function ($query) {
+                $query->whereHas('technician', function ($q) {
+                    $q->where('name', 'like', '%' . request('search') . '%');
+                });
+            })
+
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+
+        // hanya check-in
+        $totalTepat = TechnicianAttendance::where('status', 'check-in')
+            ->where('is_late', false)
+            ->count();
+
+        $totalTerlambat = TechnicianAttendance::where('status', 'check-in')
+            ->where('is_late', true)
+            ->count();
+
+
+        return view('admin.attendance.history', compact(
+            'histories',
+            'totalTepat',
+            'totalTerlambat'
+        ));
     }
-
+}
