@@ -62,6 +62,30 @@
                         </div>
 
                         <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                         <i class="fas fa-percent text-green-600 mr-2"></i>Discount (Rp)
+                        </label>
+
+                        <input
+                        type="number"
+                        name="discount"
+                        id="discount"
+                        value="{{ old('discount', $customer->discount) }}"
+                        min="0"
+                        step="1000"
+                        placeholder="Contoh: 10000"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500 @error('discount') border-red-500 @enderror">
+
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Nominal diskon yang akan menjadi potongan pada tagihan customer.
+        </p>
+
+        @error('discount')
+        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+    @enderror
+</div>
+
+                        <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Package</label>
                             <select name="package_id" class="w-full px-4 py-2 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500">
                                 <option value="">No Package</option>

@@ -377,13 +377,15 @@
         document.getElementById('lokasi-info').innerHTML = '<span style="color:#ca8a04">⏳ Mendeteksi lokasi...</span>';
 
         navigator.geolocation.getCurrentPosition(pos => {
-            lat = pos.coords.latitude.toFixed(7);
-            lng = pos.coords.longitude.toFixed(7);
 
-            if (marker) map.removeLayer(marker);
-            marker = L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Anda').openPopup();
-            map.setView([lat, lng], 16);
+        console.log("Latitude :", pos.coords.latitude);
+        console.log("Longitude:", pos.coords.longitude);
+        console.log("Accuracy :", pos.coords.accuracy, "meter");
 
+        lat = pos.coords.latitude.toFixed(7);
+        lng = pos.coords.longitude.toFixed(7);
+
+        if (marker) map.removeLayer(marker);
             document.getElementById('input-lat').value = lat;
             document.getElementById('input-lng').value = lng;
 

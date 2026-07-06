@@ -77,6 +77,29 @@
                             @error('address')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                         </div>
 
+                            <div class="md:col-span-2">
+                            <label for="discount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <i class="fas fa-percent mr-2 text-green-600"></i>Discount (Rp)
+                            </label>
+                            <input
+                             type="number"
+                             name="discount"
+                             id="discount"
+                             value="{{ old('discount', 0) }}"
+                             min="0"
+                             step="1000"
+                            placeholder="Contoh: 10000"
+                           class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent @error('discount') border-red-500 @enderror">
+
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Masukkan nominal diskon dalam Rupiah. Nilai ini akan menjadi potongan pada tagihan customer.
+             </p>
+
+            @error('discount')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+         @enderror
+    </div>
+
                             <div class="mt-4">
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                      Foto KTP

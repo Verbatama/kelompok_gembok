@@ -5,6 +5,7 @@
 @section('content')
 
 @include('admin.partials.sidebar')
+    @include('admin.partials.topbar')
 
 <div class="min-h-screen bg-gray-100 dark:bg-slate-900 p-6 md:ml-64">
 

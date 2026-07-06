@@ -61,7 +61,7 @@
                             <option value="1" {{ request('is_late') == '1' ? 'selected' : '' }}>Terlambat</option>
                             <option value="0" {{ request('is_late') == '0' ? 'selected' : '' }}>Tepat Waktu</option>
                         </select>
-                    </div>
+                    </div>  
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cari Teknisi</label>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Nama teknisi..." class="w-full rounded-lg border border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-600 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500">
@@ -110,7 +110,7 @@
                                 <td class="px-6 py-4">
 
                                     @if($history->status === 'absent')<span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-black text-white">
-                                        <i class="fas fa-sign-out-alt mr-1"></i> Absent
+                                        <i class="fas fa-sign-out-alt mr-1"></i> Tidak Masuk
                                     </span @elseif ($history->status === 'check-in')
                                     <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-400">
                                         <i class="fas fa-sign-in-alt mr-1"></i> Check-In

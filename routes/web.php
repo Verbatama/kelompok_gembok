@@ -1,28 +1,25 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AdminAttendanceController;
+use App\Http\Controllers\Admin\AgentController;
+use App\Http\Controllers\Admin\AttendanceHistoryController;
+use App\Http\Controllers\Admin\CollectorController;
 use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\Admin\PackageController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\InvoiceController;
+use App\Http\Controllers\Admin\OdpController;
+use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TechnicianController;
-use App\Http\Controllers\Admin\CollectorController;
-use App\Http\Controllers\Admin\AgentController;
-use App\Http\Controllers\Admin\VoucherController;
-use App\Http\Controllers\Admin\OdpController;
 use App\Http\Controllers\Admin\TicketController;
-use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\TiketGangguanController;
+use App\Http\Controllers\Admin\VoucherController;
 use App\Http\Controllers\Portal\TechnicianAttendanceController;
-use App\Http\Controllers\Admin\AdminAttendanceController;
-use App\Http\Controllers\Admin\AttendanceHistoryController;
+use Illuminate\Support\Facades\Route;
 
-
-
-
-
-
+// superadmin
+Route::view('/dashboardsuper', 'superadmin.index')->name('dashboard');
 
 // ============================================================
 // Public Routes
@@ -48,7 +45,6 @@ Route::get('/login', function () {
     return redirect('/admin/login');
 })->name('login');
 
-
 // ============================================================
 // Admin Routes
 // ============================================================
@@ -65,10 +61,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        //ABSENSI
+        // ABSENSI
         Route::get('/attendance', [AdminAttendanceController::class, 'index'])->name('attendance.index');
         Route::post('/attendance', [AdminAttendanceController::class, 'store'])->name('attendance.store');
-        //riwayat absen teknisi
+        // riwayat absen teknisi
         Route::get('/attendance-history', [AttendanceHistoryController::class, 'index'])
             ->name('attendance.history');
 
@@ -89,8 +85,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Technician Management
         Route::resource('technicians', TechnicianController::class);
-
-
 
         // Collector Management
         Route::resource('collectors', CollectorController::class);
@@ -357,9 +351,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/genieacs/test', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'testGenieacs'])->name('genieacs.test');
 
             // WhatsApp
-            Route::get('/whatssapp', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveWhatsapp'])->name('whatsapp.save');
-            Route::post('/whatapp', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'whatsapp'])->name('whatsapp');
-            Route::post('/whatsapp/test', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'testWhatsapp'])->name('whatsapp.test');
+            Route::get('/whatsapp', [IntegrationSettingController::class, 'whatsapp'])
+                ->name('whatsapp');
+
+            Route::post('/whatsapp', [IntegrationSettingController::class, 'saveWhatsapp'])
+                ->name('whatsapp.save');
+
+            Route::post('/whatsapp/test', [IntegrationSettingController::class, 'testWhatsapp'])
+                ->name('whatsapp.test');    
 
             // Midtrans
             Route::get('/midtrans', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'midtrans'])->name('midtrans');
@@ -416,7 +415,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/database/export/download', [\App\Http\Controllers\Admin\CustomerExportController::class, 'export'])->name('database.export.download');
 
         Route::get('/ppoe-monitoring', [\App\Http\Controllers\Admin\PPOEMonitoringController::class, 'index']);
-        // Payroll
+
         // Payroll
         Route::get('/payroll', [\App\Http\Controllers\Admin\TechnicianPayrollController::class, 'index'])
             ->name('payroll.index');
@@ -441,7 +440,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
-
 // ============================================================
 // Agent Routes
 // ============================================================
@@ -464,7 +462,6 @@ Route::prefix('agent')->name('agent.')->group(function () {
     });
 });
 
-
 // ============================================================
 // Collector Routes
 // ============================================================
@@ -485,7 +482,6 @@ Route::prefix('collector')->name('collector.')->group(function () {
     });
 });
 
-
 // ============================================================
 // Technician Routes
 // ============================================================
@@ -495,14 +491,12 @@ Route::prefix('technician')->name('technician.')->group(function () {
     })->name('login');
     Route::post('/login', [\App\Http\Controllers\Portal\TechnicianController::class, 'login'])->name('login.post');
 
-
     Route::get('/dashboard', [\App\Http\Controllers\Portal\TechnicianController::class, 'dashboard'])->name('dashboard');
     Route::post('/logout', [\App\Http\Controllers\Portal\TechnicianController::class, 'logout'])->name('logout');
 
     Route::get('/attendance', [\App\Http\Controllers\Portal\TechnicianAttendanceController::class, 'index'])->name('attendance.index');
     Route::post('/attendance', [\App\Http\Controllers\Portal\TechnicianAttendanceController::class, 'store'])
         ->name('attendance.store');
-
 
     Route::get('/tasks', [\App\Http\Controllers\Portal\TechnicianController::class, 'tasks'])->name('tasks');
     Route::get('/tasks/{task}', [\App\Http\Controllers\Portal\TechnicianController::class, 'showTask'])->name('tasks.show');
@@ -512,8 +506,6 @@ Route::prefix('technician')->name('technician.')->group(function () {
     Route::get('/map', [\App\Http\Controllers\Portal\TechnicianController::class, 'map'])->name('map');
     Route::get('/profile', [\App\Http\Controllers\Portal\TechnicianController::class, 'profile'])->name('profile');
 });
-
-
 
 // ============================================================
 // Customer Portal Routes — TIDAK ADA akses /attendance
@@ -540,7 +532,6 @@ Route::prefix('customer')->name('customer.')->group(function () {
     Route::get('/usage', [\App\Http\Controllers\Portal\CustomerController::class, 'usage'])->name('usage');
 });
 
-
 // ============================================================
 // Public Voucher Purchase
 // ============================================================
@@ -553,9 +544,9 @@ Route::prefix('voucher')->name('voucher.')->group(function () {
     Route::get('/success/{id}', [VoucherController::class, 'success'])->name('success');
 });
 
-
 use App\Http\Controllers\MidtransContoller;
-//midtrans webhook
+
+// midtrans webhook
 Route::post(
     '/midtrans/notification',
     [MidtransContoller::class, 'notification']

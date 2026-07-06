@@ -60,6 +60,7 @@ class CustomerController extends Controller
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
+            'discount'=>'nullable|numeric|min:0',
             'ktp_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'house_photos.*' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
             'package_id' => 'nullable|exists:packages,id',

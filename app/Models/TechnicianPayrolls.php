@@ -24,6 +24,7 @@ class TechnicianPayrolls extends Model
         'processed_at',
     ];
 
+
     protected $casts = [
         'processed_at' => 'datetime',
     ];

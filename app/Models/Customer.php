@@ -16,6 +16,7 @@ class Customer extends Model
         'phone',
         'email',
         'address',
+        'discount',
         'ktp_photo',
         'latitude',
         'longitude',

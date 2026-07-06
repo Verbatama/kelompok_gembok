@@ -57,6 +57,24 @@
                                 <p class="font-medium text-gray-900 dark:text-white">{{ $customer->address ?? '-' }}</p>
                             </div>
                             <div>
+                                <<p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Discount</p>
+
+                                @if($customer->discount > 0)
+                            <p class="text-sm text-green-600 font-semibold mt-1">
+                             Discount: -Rp {{ number_format($customer->discount, 0, ',', '.') }}
+                            </p>
+
+                            <p class="text-lg font-bold text-blue-600">
+                                <!-- Menggunakan ?? 0 untuk jaga-jaga jika $customer->package bernilai null -->
+                            Total: Rp {{ number_format(max(($customer->package->price ?? 0) - $customer->discount, 0), 0, ',', '.') }}
+                            </p>
+                        @else
+                    <p class="text-lg font-bold text-blue-600">
+                            Total: Rp {{ number_format($customer->package->price ?? 0, 0, ',', '.') }}
+                    </p>
+                    @endif
+
+                            <div>
                                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Status</p>
                                 <span class="px-3 py-1 rounded-full text-sm font-semibold {{ $customer->status === 'active' ? 'bg-green-100 text-green-800' : ($customer->status === 'suspended' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
                                     {{ ucfirst($customer->status) }}
