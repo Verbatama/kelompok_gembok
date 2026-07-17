@@ -25,8 +25,6 @@ class Customer extends Model
         'join_date',
     ];
 
-    
-
     protected $appends = ['odp_id'];
 
     public function getOdpIdAttribute()
@@ -57,19 +55,18 @@ class Customer extends Model
     {
         return $this->hasMany(OnuDevice::class);
     }
-    public function radiusSessions()
-{
-    return $this->hasMany(
-        Radacct::class,
-        'username',
-        'pppoe_username'
-    );
 
-    
-}
+    public function radiusSessions()
+    {
+        return $this->hasMany(
+            Radacct::class,
+            'username',
+            'pppoe_username'
+        );
+    }
 
     public function housePhotos()
-{
-    return $this->hasMany(CustomerHousePhoto::class);
-}
+    {
+        return $this->hasMany(CustomerHousePhoto::class);
+    }
 }

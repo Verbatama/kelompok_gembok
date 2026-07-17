@@ -3,7 +3,7 @@
 @section('title', 'Laporan')
 
 @section('content')
-<div class="min-h-screen bg-gray-100" x-data="{ sidebarOpen: false }">
+<div class="min-h-screen bg-gray-100 dark:bg-slate-900 transition-colors duration-300" x-data="{ sidebarOpen: false }">
     @include('admin.partials.sidebar')
 
     <div class="lg:pl-64">
@@ -14,17 +14,17 @@
                 <!-- Header -->
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Laporan & Analitik</h1>
-                        <p class="text-gray-500">Ringkasan data bisnis ISP Anda</p>
+                        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Laporan & Analitik</h1>
+                        <p class="text-gray-500 dark:text-gray-400">Ringkasan data bisnis ISP Anda</p>
                     </div>
                     <div class="mt-4 md:mt-0 flex flex-wrap gap-2">
-                        <select id="period" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        <select id="period" class="px-4 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-gray-800 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
                             <option value="today">Hari Ini</option>
                             <option value="week">Minggu Ini</option>
                             <option value="month" selected>Bulan Ini</option>
                             <option value="year">Tahun Ini</option>
                         </select>
-                        <select id="exportType" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
+                        <select id="exportType" class="px-4 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-gray-800 dark:text-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent">
                             <option value="summary">Ringkasan</option>
                             <option value="revenue">Pendapatan</option>
                             <option value="customers">Pelanggan</option>
@@ -37,11 +37,11 @@
                                 <i class="fas fa-download mr-2"></i>Export
                                 <i class="fas fa-chevron-down ml-2 text-xs"></i>
                             </button>
-                            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border z-10">
-                                <button onclick="exportReport('csv')" class="w-full px-4 py-2 text-left hover:bg-gray-100 rounded-t-lg">
+                            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-40 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 security-z-10">
+                                <button onclick="exportReport('csv')" class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-t-lg">
                                     <i class="fas fa-file-csv mr-2 text-green-600"></i>CSV
                                 </button>
-                                <button onclick="exportReport('json')" class="w-full px-4 py-2 text-left hover:bg-gray-100 rounded-b-lg">
+                                <button onclick="exportReport('json')" class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-b-lg">
                                     <i class="fas fa-file-code mr-2 text-blue-600"></i>JSON
                                 </button>
                             </div>
@@ -55,230 +55,240 @@
                     </div>
                 </div>
 
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Total Pendapatan</p>
-                    <p class="text-2xl font-bold text-green-600">Rp {{ number_format($totalRevenue ?? 0, 0, ',', '.') }}</p>
-                    <p class="text-sm {{ ($revenueGrowth ?? 0) >= 0 ? 'text-green-500' : 'text-red-500' }}">
-                        <i class="fas fa-{{ ($revenueGrowth ?? 0) >= 0 ? 'arrow-up' : 'arrow-down' }} mr-1"></i>
-                        {{ abs($revenueGrowth ?? 0) }}% dari periode sebelumnya
-                    </p>
-                </div>
-                <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-money-bill-wave text-green-600 text-2xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Pelanggan Aktif</p>
-                    <p class="text-2xl font-bold text-cyan-600">{{ number_format($activeCustomers ?? 0) }}</p>
-                    <p class="text-sm {{ ($customerGrowth ?? 0) >= 0 ? 'text-green-500' : 'text-red-500' }}">
-                        <i class="fas fa-{{ ($customerGrowth ?? 0) >= 0 ? 'arrow-up' : 'arrow-down' }} mr-1"></i>
-                        {{ abs($customerGrowth ?? 0) }}% pertumbuhan
-                    </p>
-                </div>
-                <div class="w-14 h-14 bg-cyan-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-users text-cyan-600 text-2xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Invoice Terbayar</p>
-                    <p class="text-2xl font-bold text-blue-600">{{ number_format($paidInvoices ?? 0) }}</p>
-                    <p class="text-sm text-gray-500">
-                        dari {{ number_format($totalInvoices ?? 0) }} total invoice
-                    </p>
-                </div>
-                <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-file-invoice-dollar text-blue-600 text-2xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-gray-500 text-sm">Penjualan Voucher</p>
-                    <p class="text-2xl font-bold text-purple-600">{{ number_format($voucherSales ?? 0) }}</p>
-                    <p class="text-sm text-gray-500">
-                        Rp {{ number_format($voucherRevenue ?? 0, 0, ',', '.') }}
-                    </p>
-                </div>
-                <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-ticket text-purple-600 text-2xl"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts Row -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Revenue Chart -->
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Pendapatan Bulanan</h3>
-            <canvas id="revenueChart" height="250"></canvas>
-        </div>
-
-        <!-- Customer Growth Chart -->
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Pertumbuhan Pelanggan</h3>
-            <canvas id="customerChart" height="250"></canvas>
-        </div>
-    </div>
-
-    <!-- More Charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Package Distribution -->
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Distribusi Paket</h3>
-            <canvas id="packageChart" height="250"></canvas>
-        </div>
-
-        <!-- Payment Methods -->
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Metode Pembayaran</h3>
-            <canvas id="paymentChart" height="250"></canvas>
-        </div>
-
-        <!-- Invoice Status -->
-        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Status Invoice</h3>
-            <canvas id="invoiceChart" height="250"></canvas>
-        </div>
-    </div>
-
-    <!-- Tables Row -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Top Packages -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div class="p-6 border-b border-gray-100">
-                <h3 class="text-lg font-semibold text-gray-800">Paket Terlaris</h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paket</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pelanggan</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pendapatan</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        @forelse($topPackages ?? [] as $package)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4">
-                                <div class="font-medium text-gray-800">{{ $package->name }}</div>
-                                <div class="text-sm text-gray-500">{{ $package->speed }}</div>
-                            </td>
-                            <td class="px-6 py-4 text-gray-600">{{ $package->customers_count }}</td>
-                            <td class="px-6 py-4 text-green-600 font-medium">Rp {{ number_format($package->revenue, 0, ',', '.') }}</td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="3" class="px-6 py-8 text-center text-gray-500">Tidak ada data</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Top Collectors -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div class="p-6 border-b border-gray-100">
-                <h3 class="text-lg font-semibold text-gray-800">Kolektor Terbaik</h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tagihan</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        @forelse($topCollectors ?? [] as $collector)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                        <i class="fas fa-user text-blue-600 text-sm"></i>
-                                    </div>
-                                    <div class="font-medium text-gray-800">{{ $collector->name }}</div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-gray-600">{{ $collector->collections_count }}</td>
-                            <td class="px-6 py-4 text-green-600 font-medium">Rp {{ number_format($collector->total_collected, 0, ',', '.') }}</td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="3" class="px-6 py-8 text-center text-gray-500">Tidak ada data</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Agent Performance -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div class="p-6 border-b border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800">Performa Agent</h3>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Agent</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Voucher Terjual</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pendapatan</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Komisi</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Saldo</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    @forelse($agentPerformance ?? [] as $agent)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-store text-emerald-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <div class="font-medium text-gray-800">{{ $agent->name }}</div>
-                                    <div class="text-sm text-gray-500">{{ $agent->phone }}</div>
-                                </div>
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">Total Pendapatan</p>
+                                <p class="text-2xl font-bold text-green-600 dark:text-green-500">Rp {{ number_format($totalRevenue ?? 0, 0, ',', '.') }}</p>
+                                <p class="text-sm {{ ($revenueGrowth ?? 0) >= 0 ? 'text-green-500' : 'text-red-500' }}">
+                                    <i class="fas fa-{{ ($revenueGrowth ?? 0) >= 0 ? 'arrow-up' : 'arrow-down' }} mr-1"></i>
+                                    {{ abs($revenueGrowth ?? 0) }}% dari periode sebelumnya
+                                </p>
                             </div>
-                        </td>
-                        <td class="px-6 py-4 text-gray-600">{{ $agent->vouchers_sold }}</td>
-                        <td class="px-6 py-4 text-gray-600">Rp {{ number_format($agent->revenue, 0, ',', '.') }}</td>
-                        <td class="px-6 py-4 text-purple-600">Rp {{ number_format($agent->commission, 0, ',', '.') }}</td>
-                        <td class="px-6 py-4 text-green-600 font-medium">Rp {{ number_format($agent->balance, 0, ',', '.') }}</td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" class="px-6 py-8 text-center text-gray-500">Tidak ada data</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                            <div class="w-14 h-14 bg-green-100 dark:bg-green-950/40 rounded-full flex items-center justify-center">
+                                <i class="fas fa-money-bill-wave text-green-600 dark:text-green-400 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">Pelanggan Aktif</p>
+                                <p class="text-2xl font-bold text-cyan-600 dark:text-cyan-500">{{ number_format($activeCustomers ?? 0) }}</p>
+                                <p class="text-sm {{ ($customerGrowth ?? 0) >= 0 ? 'text-green-500' : 'text-red-500' }}">
+                                    <i class="fas fa-{{ ($customerGrowth ?? 0) >= 0 ? 'arrow-up' : 'arrow-down' }} mr-1"></i>
+                                    {{ abs($customerGrowth ?? 0) }}% pertumbuhan
+                                </p>
+                            </div>
+                            <div class="w-14 h-14 bg-cyan-100 dark:bg-cyan-950/40 rounded-full flex items-center justify-center">
+                                <i class="fas fa-users text-cyan-600 dark:text-cyan-400 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">Invoice Terbayar</p>
+                                <p class="text-2xl font-bold text-blue-600 dark:text-blue-500">{{ number_format($paidInvoices ?? 0) }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    dari {{ number_format($totalInvoices ?? 0) }} total invoice
+                                </p>
+                            </div>
+                            <div class="w-14 h-14 bg-blue-100 dark:bg-blue-950/40 rounded-full flex items-center justify-center">
+                                <i class="fas fa-file-invoice-dollar text-blue-600 dark:text-blue-400 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">Penjualan Voucher</p>
+                                <p class="text-2xl font-bold text-purple-600 dark:text-purple-500">{{ number_format($voucherSales ?? 0) }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    Rp {{ number_format($voucherRevenue ?? 0, 0, ',', '.') }}
+                                </p>
+                            </div>
+                            <div class="w-14 h-14 bg-purple-100 dark:bg-purple-950/40 rounded-full flex items-center justify-center">
+                                <i class="fas fa-ticket text-purple-600 dark:text-purple-400 text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Revenue Chart -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Pendapatan Bulanan</h3>
+                        <canvas id="revenueChart" height="250"></canvas>
+                    </div>
+
+                    <!-- Customer Growth Chart -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Pertumbuhan Pelanggan</h3>
+                        <canvas id="customerChart" height="250"></canvas>
+                    </div>
+                </div>
+
+                <!-- More Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Package Distribution -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Distribusi Paket</h3>
+                        <canvas id="packageChart" height="250"></canvas>
+                    </div>
+
+                    <!-- Payment Methods -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Metode Pembayaran</h3>
+                        <canvas id="paymentChart" height="250"></canvas>
+                    </div>
+
+                    <!-- Invoice Status -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-slate-700 transition-colors duration-300">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Status Invoice</h3>
+                        <canvas id="invoiceChart" height="250"></canvas>
+                    </div>
+                </div>
+
+                <!-- Tables Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Top Packages -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+                        <div class="p-6 border-b border-gray-100 dark:border-slate-700">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Paket Terlaris</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50 dark:bg-slate-900/50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Paket</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Pelanggan</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Pendapatan</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+                                    @forelse($topPackages ?? [] as $package)
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                                        <td class="px-6 py-4">
+                                            <div class="font-medium text-gray-800 dark:text-gray-200">{{ $package->name }}</div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">{{ $package->speed }}</div>
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-600 dark:text-gray-300">{{ $package->customers_count }}</td>
+                                        <td class="px-6 py-4 text-green-600 dark:text-green-400 font-medium">Rp {{ number_format($package->revenue, 0, ',', '.') }}</td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="3" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">Tidak ada data</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Top Collectors -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+                        <div class="p-6 border-b border-gray-100 dark:border-slate-700">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Kolektor Terbaik</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50 dark:bg-slate-900/50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nama</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tagihan</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+                                    @forelse($topCollectors ?? [] as $collector)
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center">
+                                                <div class="w-8 h-8 bg-blue-100 dark:bg-blue-950/50 rounded-full flex items-center justify-center mr-3">
+                                                    <i class="fas fa-user text-blue-600 dark:text-blue-400 text-sm"></i>
+                                                </div>
+                                                <div class="font-medium text-gray-800 dark:text-gray-200">{{ $collector->name }}</div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-gray-600 dark:text-gray-300">{{ $collector->collections_count }}</td>
+                                        <td class="px-6 py-4 text-green-600 dark:text-green-400 font-medium">Rp {{ number_format($collector->total_collected, 0, ',', '.') }}</td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="3" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">Tidak ada data</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agent Performance -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors duration-300">
+                    <div class="p-6 border-b border-gray-100 dark:border-slate-700">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Performa Agent</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 dark:bg-slate-900/50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Agent</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Voucher Terjual</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Pendapatan</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Komisi</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Saldo</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+                                @forelse($agentPerformance ?? [] as $agent)
+                                <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-950/50 rounded-full flex items-center justify-center mr-3">
+                                                <i class="fas fa-store text-emerald-600 dark:text-emerald-400 text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-medium text-gray-800 dark:text-gray-200">{{ $agent->name }}</div>
+                                                <div class="text-sm text-gray-500 dark:text-gray-400">{{ $agent->phone }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-gray-600 dark:text-gray-300">{{ $agent->vouchers_sold }}</td>
+                                    <td class="px-6 py-4 text-gray-600 dark:text-gray-300">Rp {{ number_format($agent->revenue, 0, ',', '.') }}</td>
+                                    <td class="px-6 py-4 text-purple-600 dark:text-purple-400">Rp {{ number_format($agent->commission, 0, ',', '.') }}</td>
+                                    <td class="px-6 py-4 text-green-600 dark:text-green-400 font-medium">Rp {{ number_format($agent->balance, 0, ',', '.') }}</td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="5" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">Tidak ada data</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+// Penyesuaian warna global Chart.js untuk Dark Mode jika diaktifkan di html/body
+const isDarkMode = document.documentElement.classList.contains('dark') || document.body.classList.contains('dark');
+if (isDarkMode) {
+    Chart.defaults.color = '#94a3b8'; // slate-400
+    Chart.defaults.scale.grid.color = '#334155'; // slate-700
+}
+
 // Revenue Chart
 const revenueCtx = document.getElementById('revenueChart').getContext('2d');
 new Chart(revenueCtx, {
@@ -385,8 +395,4 @@ function exportReport(format = 'csv') {
     window.location.href = `/admin/reports/export?period=${period}&type=${type}&format=${format}`;
 }
 </script>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection

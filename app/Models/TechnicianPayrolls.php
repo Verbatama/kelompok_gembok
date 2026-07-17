@@ -22,6 +22,7 @@ class TechnicianPayrolls extends Model
         'total_diterima',
         'status',
         'processed_at',
+        
     ];
 
 

@@ -49,6 +49,11 @@ class TechnicianController extends Controller
             'notes' => 'nullable|string',
             'area_coverage' => 'nullable|string',
             'whatsapp_group_id' => 'nullable|string',
+            'check_in_limit' => 'nullable|date_format:H:i',
+
+
+            'bonus_check_out_mulai' => 'nullable|date_format:H:i',
+            'bonus_check_out_selesai' => 'nullable|date_format:H:i',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -84,6 +89,13 @@ class TechnicianController extends Controller
             'gaji_pokok' => 'required|integer|min:0',
             'whatsapp_group_id' => 'nullable|string',
             'is_active' => 'nullable|in:0,1',
+            'check_in_limit' => 'nullable|date_format:H:i',
+
+            
+            'bonus_check_out_mulai' => 'nullable|date_format:H:i',
+            'bonus_check_out_selesai' => 'nullable|date_format:H:i',
+            
+              
         ]);
 
         $validated['is_active'] = $request->input('is_active', 0) == 1;

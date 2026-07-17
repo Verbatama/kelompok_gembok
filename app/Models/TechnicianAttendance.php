@@ -14,7 +14,11 @@ class TechnicianAttendance extends Model
         'latitude',
         'longitude',
         'is_late',
-        'absent'
+        'absent',
+        'check_in_limit',
+        'bonus_check_out_mulai',
+        'bonus_check_out_selesai',
+        'bonus_didapat',
     ];
 
     public function technician()

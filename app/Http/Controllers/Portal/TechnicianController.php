@@ -102,7 +102,7 @@ class TechnicianController extends Controller
 
     public function updateTask(Request $request, $taskId)
     {
-        // TODO: Implement task update logic
+        //TODO: Implement task update logic
         return back()->with('success', 'Status tugas berhasil diperbarui');
     }
 

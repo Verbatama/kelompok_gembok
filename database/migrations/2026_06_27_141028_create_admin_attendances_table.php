@@ -22,7 +22,16 @@ return new class extends Migration
         $table->enum('status', ['check-in', 'check-out']);
         $table->decimal('latitude', 10, 7)->nullable();
         $table->decimal('longitude', 10, 7)->nullable();
+        $table->time('check_in_limit')->nullable();
 
+        
+
+        // Rentang bonus check out
+        $table->time('bonus_check_out_mulai')->nullable();
+        $table->time('bonus_check_out_selesai')->nullable();
+
+      
+        $table->boolean('bonus_didapat')->default(false);
         $table->timestamps();
 });
     }

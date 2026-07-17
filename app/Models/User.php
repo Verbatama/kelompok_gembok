@@ -22,7 +22,10 @@ class User extends Authenticatable
         'email',
         'password',
         'email_verified_at',
-        
+        'is_superadmin',
+        'check_in_limit',
+        'bonus_check_out_mulai',
+        'bonus_check_out_selesai',
         
     ];
 
@@ -49,5 +52,9 @@ class User extends Authenticatable
         ];
     }
 
+    public function AdminLeaveRequest()
+    {
+        return $this->hasMany(AdminLeaveRequest::class);
+    }
     
 }

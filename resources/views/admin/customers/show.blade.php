@@ -106,6 +106,36 @@
                     @endif
 
                     <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6">
+    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        <i class="fas fa-id-card mr-2 text-cyan-600"></i>Foto KTP
+    </h2>
+    @if($customer->ktp_photo)
+        <a href="{{ Storage::url($customer->ktp_photo) }}" target="_blank">
+            <img src="{{ Storage::url($customer->ktp_photo) }}"
+                 class="w-full max-w-xs h-40 object-cover rounded-lg border border-gray-200 dark:border-slate-600 hover:opacity-80 transition">
+        </a>
+    @else
+        <p class="text-gray-500 dark:text-gray-400 text-sm">Belum ada foto KTP</p>
+    @endif
+</div>
+
+<div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6">
+    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        <i class="fas fa-home mr-2 text-blue-600"></i>Foto Rumah
+    </h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        @forelse($customer->housePhotos as $item)
+            <a href="{{ Storage::url($item->photo) }}" target="_blank">
+                <img src="{{ Storage::url($item->photo) }}"
+                     class="w-full h-28 object-cover rounded-lg border border-gray-200 dark:border-slate-600 hover:opacity-80 transition">
+            </a>
+        @empty
+            <p class="text-gray-500 dark:text-gray-400 col-span-3 text-sm">Belum ada foto rumah</p>
+        @endforelse
+    </div>
+</div>
+
+                    <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6">
                         <div class="flex items-center justify-between mb-4">
                             <h2 class="text-xl font-bold text-gray-900 dark:text-white">
                                 <i class="fas fa-file-invoice mr-2 text-blue-600"></i>Recent Invoices

@@ -9,6 +9,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        .tech-toggle-btn {
+            background: linear-gradient(135deg, #f97316, #dc2626);
+            box-shadow: 0 0 12px -2px rgba(249, 115, 22, 0.6);
+        }
+    </style>
 </head>
 
 <body class="bg-gray-50 min-h-screen" x-data="{ sidebarOpen: false }">
@@ -45,6 +51,12 @@
                 <i class="fas fa-clipboard-check w-5 mr-3"></i>
                 <span>Absensi</span>
             </a>
+             <a href="{{ route('technician.leave.index') }}"
+                class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.leave.*') ? 'bg-slate-700 text-white' : '' }}">
+                <i class="fas fa-umbrella-beach w-5 mr-3"></i>
+                <span>Pengajuan Libur</span>
+            </a>
+            
             <a href="{{ route('technician.tasks') }}"
                 class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-slate-700 {{ request()->routeIs('technician.tasks*') ? 'bg-slate-700 text-white' : '' }}">
                 <i class="fas fa-plug w-5 mr-3"></i>
@@ -83,6 +95,16 @@
             </form>
         </div>
     </aside>
+
+    <!-- Tombol toggle sidebar - nempel di tengah tepi sidebar, di luar <aside> supaya fixed-nya presisi -->
+    <button
+        @click="sidebarOpen = !sidebarOpen"
+        class="tech-toggle-btn fixed top-1/2 -translate-y-1/2 z-50 flex items-center justify-center w-8 h-8 rounded-full text-white transition-all duration-300 ease-in-out lg:hidden"
+        :style="{ left: sidebarOpen ? '16rem' : '0' }"
+    >
+        <i class="fas fa-chevron-left text-xs transition-transform duration-300"
+           :class="sidebarOpen ? '' : 'rotate-180'"></i>
+    </button>
 
     <!-- Main Content -->
     <div class="lg:ml-64">

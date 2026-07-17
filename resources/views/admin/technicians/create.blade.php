@@ -18,7 +18,6 @@
         @include('admin.partials.topbar')
 
         <div class="p-6">
-            <!-- Header -->
             <div class="mb-6">
                 <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
                     <a href="{{ route('admin.dashboard') }}" class="hover:text-cyan-600 dark:hover:text-cyan-400">Dashboard</a>
@@ -30,141 +29,132 @@
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Add New Technician</h1>
             </div>
 
-            <!-- Form -->
             <div class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6 max-w-3xl">
                 <form action="{{ route('admin.technicians.store') }}" method="POST">
                     @csrf
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Name -->
                         <div class="md:col-span-2">
                             <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 <i class="fas fa-user mr-2 text-cyan-600 dark:text-cyan-400"></i>Full Name *
                             </label>
                             <input type="text" name="name" id="name" value="{{ old('name') }}" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent @error('name') border-red-500 dark:border-red-500 @enderror">
                             @error('name')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Role -->
                         <div>
                             <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 <i class="fas fa-id-card mr-2 text-cyan-600 dark:text-cyan-400"></i>Role *
                             </label>
                             <select name="role" id="role" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent @error('role') border-red-500 dark:border-red-500 @enderror">
-                                <option value="technician" {{ old('role') == 'technician' ? 'selected' : '' }}>
-                                    Technician
-                                </option>
-                                <option value="installer" {{ old('role') == 'installer' ? 'selected' : '' }}>Installer
-                                </option>
-                                <option value="supervisor" {{ old('role') == 'supervisor' ? 'selected' : '' }}>
-                                    Supervisor
-                                </option>
+                                <option value="technician" {{ old('role') == 'technician' ? 'selected' : '' }}>Technician</option>
+                                <option value="installer" {{ old('role') == 'installer' ? 'selected' : '' }}>Installer</option>
+                                <option value="supervisor" {{ old('role') == 'supervisor' ? 'selected' : '' }}>Supervisor</option>
                             </select>
                             @error('role')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
 
-
-
-                        <!-- Phone -->
                         <div>
                             <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 <i class="fas fa-phone mr-2 text-cyan-600 dark:text-cyan-400"></i>Phone Number
                             </label>
                             <input type="text" name="phone" id="phone" value="{{ old('phone') }}" class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent @error('phone') border-red-500 dark:border-red-500 @enderror">
                             @error('phone')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Gaji Pokok -->
                         <div>
                             <label for="gaji_pokok" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 <i class="fas fa-money-bill-wave mr-2 text-green-600 dark:text-green-400"></i>Gaji Pokok
                             </label>
-
                             <input type="number" name="gaji_pokok" id="gaji_pokok" value="{{ old('gaji_pokok', 0) }}" min="0" placeholder="Contoh: 3000000" class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent @error('gaji_pokok') border-red-500 dark:border-red-500 @enderror">
-
                             @error('gaji_pokok')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">
-                                {{ $message }}
-                            </p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Username -->
                         <div>
                             <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 <i class="fas fa-user-circle mr-2 text-cyan-600 dark:text-cyan-400"></i>Username *
                             </label>
                             <input type="text" name="username" id="username" value="{{ old('username') }}" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent @error('username') border-red-500 dark:border-red-500 @enderror">
                             @error('username')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Password -->
                         <div>
                             <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 <i class="fas fa-lock mr-2 text-cyan-600 dark:text-cyan-400"></i>Password *
                             </label>
                             <input type="password" name="password" id="password" required class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent @error('password') border-red-500 dark:border-red-500 @enderror">
                             @error('password')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
-                        <!-- Email -->
-                        <div class="md:col-span-2">
+
+                        <div>
                             <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 <i class="fas fa-envelope mr-2 text-cyan-600 dark:text-cyan-400"></i>Email Address
                             </label>
                             <input type="email" name="email" id="email" value="{{ old('email') }}" class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent @error('email') border-red-500 dark:border-red-500 @enderror">
                             @error('email')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
 
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Batas Check In</label>
+                            <input type="time" name="check_in_limit" value="{{ old('check_in_limit') }}" class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500">
+                        </div>
 
-                        <!-- Area Coverage -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bonus Check Out Mulai</label>
+                            <input type="time" name="bonus_check_out_mulai" value="{{ old('bonus_check_out_mulai') }}" class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bonus Check Out Selesai</label>
+                            <input type="time" name="bonus_check_out_selesai" value="{{ old('bonus_check_out_selesai') }}" class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500">
+                        </div>
+
                         <div class="md:col-span-2">
                             <label for="area_coverage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 <i class="fas fa-map-marker-alt mr-2 text-cyan-600 dark:text-cyan-400"></i>Area Coverage
                             </label>
                             <input type="text" name="area_coverage" id="area_coverage" value="{{ old('area_coverage') }}" placeholder="e.g. North Jakarta, Block A-C" class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent @error('area_coverage') border-red-500 dark:border-red-500 @enderror">
                             @error('area_coverage')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- WhatsApp Group ID -->
                         <div class="md:col-span-2">
                             <label for="whatsapp_group_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 <i class="fab fa-whatsapp mr-2 text-green-600 dark:text-green-400"></i>WhatsApp Group ID
                             </label>
                             <input type="text" name="whatsapp_group_id" id="whatsapp_group_id" value="{{ old('whatsapp_group_id') }}" class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent @error('whatsapp_group_id') border-red-500 dark:border-red-500 @enderror">
-                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Optional: For automated
-                                notifications</p>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Optional: For automated notifications</p>
                             @error('whatsapp_group_id')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Notes -->
                         <div class="md:col-span-2">
                             <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 <i class="fas fa-sticky-note mr-2 text-cyan-600 dark:text-cyan-400"></i>Notes
                             </label>
                             <textarea name="notes" id="notes" rows="3" class="w-full px-4 py-3 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent @error('notes') border-red-500 dark:border-red-500 @enderror">{{ old('notes') }}</textarea>
                             @error('notes')
-                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <!-- Actions -->
                     <div class="mt-8 flex items-center justify-end space-x-4">
                         <a href="{{ route('admin.technicians.index') }}" class="px-6 py-3 border border-gray-300 dark:border-slate-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-600 transition">
                             <i class="fas fa-times mr-2"></i>Cancel

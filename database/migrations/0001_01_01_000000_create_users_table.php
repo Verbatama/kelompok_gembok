@@ -18,7 +18,17 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            $table->time('check_in_limit')->nullable();
+
+
+            // Rentang bonus check out
+            $table->time('bonus_check_out_mulai')->nullable();
+            $table->time('bonus_check_out_selesai')->nullable();
+            
+            $table->boolean('is_superadmin')->default(false);
             $table->timestamps();
+
+        
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

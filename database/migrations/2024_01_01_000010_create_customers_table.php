@@ -22,6 +22,11 @@ return new class extends Migration
             $table->string('ktp_photo')->nullable();
             $table->foreignId('package_id')->nullable()->constrained('packages')->nullOnDelete();
             $table->string('status')->default('active');
+            // $table->date('paket_aktif');
+            // $table->date('jatuh_tempo');
+            // $table->unsignedTinyInteger('tempo_suspend');
+            // $table->unsignedTinyInteger('invoice_reminder');
+            
             $table->timestamp('join_date')->useCurrent();
             $table->timestamps();
         });

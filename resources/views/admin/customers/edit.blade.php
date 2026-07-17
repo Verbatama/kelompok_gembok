@@ -27,7 +27,10 @@
             </div>
 
             <div class="max-w-3xl">
-                <form action="{{ route('admin.customers.update', $customer) }}" method="POST" class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6">
+                <form action="{{ route('admin.customers.update', $customer) }}"
+                      method="POST"
+                      enctype="multipart/form-data"
+                      class="bg-white dark:bg-slate-700 rounded-xl shadow-md p-6">
                     @csrf
                     @method('PUT')
 
@@ -42,48 +45,119 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Username</label>
-                            <input type="text" name="username" value="{{ old('username', $customer->username) }}" class="w-full px-4 py-2 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500">
+                            <input type="text" name="username" value="{{ old('username', $customer->username) }}" class="w-full px-4 py-2 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 @error('username') border-red-500 @enderror">
+                            @error('username')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone</label>
-                                <input type="text" name="phone" value="{{ old('phone', $customer->phone) }}" class="w-full px-4 py-2 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500">
+                                <input type="text" name="phone" value="{{ old('phone', $customer->phone) }}" class="w-full px-4 py-2 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 @error('phone') border-red-500 @enderror">
+                                @error('phone')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
-                                <input type="email" name="email" value="{{ old('email', $customer->email) }}" class="w-full px-4 py-2 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500">
+                                <input type="email" name="email" value="{{ old('email', $customer->email) }}" class="w-full px-4 py-2 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 @error('email') border-red-500 @enderror">
+                                @error('email')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Address</label>
-                            <textarea name="address" rows="3" class="w-full px-4 py-2 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500">{{ old('address', $customer->address) }}</textarea>
+                            <textarea name="address" rows="3" class="w-full px-4 py-2 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-cyan-500 @error('address') border-red-500 @enderror">{{ old('address', $customer->address) }}</textarea>
+                            @error('address')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
                         </div>
 
                         <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                         <i class="fas fa-percent text-green-600 mr-2"></i>Discount (Rp)
-                        </label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <i class="fas fa-percent text-green-600 mr-2"></i>Discount (Rp)
+                            </label>
+                            <input
+                                type="number"
+                                name="discount"
+                                id="discount"
+                                value="{{ old('discount', $customer->discount) }}"
+                                min="0"
+                                step="1000"
+                                placeholder="Contoh: 10000"
+                                class="w-full px-4 py-2 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500 @error('discount') border-red-500 @enderror">
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                Nominal diskon yang akan menjadi potongan pada tagihan customer.
+                            </p>
+                            @error('discount')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                        </div>
 
-                        <input
-                        type="number"
-                        name="discount"
-                        id="discount"
-                        value="{{ old('discount', $customer->discount) }}"
-                        min="0"
-                        step="1000"
-                        placeholder="Contoh: 10000"
-                        class="w-full px-4 py-2 border border-gray-300 dark:border-slate-500 dark:bg-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-green-500 @error('discount') border-red-500 @enderror">
+                        <!-- Foto KTP -->
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Foto KTP
+                            </label>
 
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Nominal diskon yang akan menjadi potongan pada tagihan customer.
-        </p>
+                            @if($customer->ktp_photo)
+                                <div class="mb-3">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Foto saat ini:</p>
+                                    <a href="{{ Storage::url($customer->ktp_photo) }}" target="_blank">
+                                        <img src="{{ Storage::url($customer->ktp_photo) }}"
+                                             class="w-40 h-28 object-cover rounded-lg border border-gray-200 dark:border-slate-600 hover:opacity-80 transition">
+                                    </a>
+                                </div>
+                            @endif
 
-        @error('discount')
-        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-    @enderror
-</div>
+                            <input
+                                type="file"
+                                name="ktp_photo"
+                                accept="image/*"
+                                class="w-full border rounded-lg p-2">
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                Kosongkan jika tidak ingin mengganti foto KTP.
+                            </p>
+
+                            @error('ktp_photo')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Foto Rumah -->
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Foto Rumah
+                            </label>
+
+                            @if($customer->housePhotos && $customer->housePhotos->count())
+                                <div class="mb-3">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Foto yang sudah ada:</p>
+                                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                        @foreach($customer->housePhotos as $item)
+                                            <a href="{{ Storage::url($item->photo) }}" target="_blank">
+                                                <img src="{{ Storage::url($item->photo) }}"
+                                                     class="w-full h-24 object-cover rounded-lg border border-gray-200 dark:border-slate-600 hover:opacity-80 transition">
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            <input
+                                id="house_photos"
+                                type="file"
+                                name="house_photos[]"
+                                multiple
+                                accept="image/*"
+                                class="w-full border rounded-lg p-2">
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                Foto baru akan ditambahkan, foto lama tidak akan terhapus otomatis.
+                            </p>
+
+                            <p id="photo-count" class="text-sm text-gray-500 mt-2">
+                                Belum ada foto dipilih.
+                            </p>
+
+                            <div id="photo-preview" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-3"></div>
+
+                            @error('house_photos.*')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Package</label>
@@ -150,4 +224,46 @@
         </div>
     </div>
 </div>
+
+<script>
+const input = document.getElementById('house_photos');
+const preview = document.getElementById('photo-preview');
+const count = document.getElementById('photo-count');
+
+input.addEventListener('change', function () {
+
+    preview.innerHTML = '';
+
+    if (this.files.length === 0) {
+        count.innerHTML = 'Belum ada foto dipilih.';
+        return;
+    }
+
+    count.innerHTML = `Total ${this.files.length} foto baru dipilih`;
+
+    Array.from(this.files).forEach(file => {
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+
+            preview.innerHTML += `
+                <div class="border rounded-lg p-2 bg-white dark:bg-slate-700">
+                    <img src="${e.target.result}"
+                         class="w-full h-32 object-cover rounded">
+
+                    <p class="text-xs mt-2 break-all text-center">
+                        ${file.name}
+                    </p>
+                </div>
+            `;
+
+        };
+
+        reader.readAsDataURL(file);
+
+    });
+
+});
+</script>
 @endsection

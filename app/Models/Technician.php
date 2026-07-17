@@ -20,6 +20,10 @@ class Technician extends Model
         'join_date',
         'last_login',
         'whatsapp_group_id',
+        'check_in_limit',
+        'bonus_check_out_mulai',
+        'bonus_check_out_selesai',
+        
     ];
 
     protected $hidden = [
@@ -41,4 +45,10 @@ class Technician extends Model
     {
         return $this->hasMany(TechnicianPayrolls::class);
     }
+
+   
+public function leaveRequests()
+{
+    return $this->hasMany(TechnicianLeaveRequest::class);
+}
 }

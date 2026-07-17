@@ -357,48 +357,113 @@
     tickClock();
 
     /* ---- MAP ---- */
-    function initMap() {
-        map = L.map('map', { zoomControl:true, attributionControl:false }).setView([-6.2, 106.816], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        getLocation();
+    /* ---- MAP ---- */
+function initMap() {
+    // Buat map tanpa posisi awal
+    map = L.map('map', {
+        zoomControl: true,
+        attributionControl: false
+    });
+
+    // Tile OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+    }).addTo(map);
+
+    // Posisi awal sementara (Indonesia)
+    map.setView([-2.5489, 118.0149], 5);
+
+    // Ambil lokasi user
+    getLocation();
+}
+
+function getLocation() {
+
+    if (!navigator.geolocation) {
+        document.getElementById('lokasi-info').innerHTML =
+            '<span style="color:#b91c1c">Browser tidak mendukung geolokasi.</span>';
+        return;
     }
 
-    function getLocation() {
-        if (!navigator.geolocation) {
-            document.getElementById('lokasi-info').innerHTML = '<span style="color:#b91c1c">Browser tidak mendukung geolokasi.</span>';
-            return;
-        }
-        document.getElementById('lokasi-info').innerHTML = '<span style="color:#ca8a04">⏳ Mendeteksi lokasi...</span>';
+    document.getElementById('lokasi-info').innerHTML =
+        '<span style="color:#ca8a04">⏳ Mendeteksi lokasi...</span>';
 
-        navigator.geolocation.getCurrentPosition(pos => {
-            lat = pos.coords.latitude.toFixed(7);
-            lng = pos.coords.longitude.toFixed(7);
+    navigator.geolocation.getCurrentPosition(
 
-            if (marker) map.removeLayer(marker);
-            marker = L.marker([lat, lng]).addTo(map).bindPopup('Lokasi Anda').openPopup();
-            map.setView([lat, lng], 16);
+        function (pos) {
+
+            const latitude  = pos.coords.latitude;
+            const longitude = pos.coords.longitude;
+
+            console.log("Latitude :", latitude);
+            console.log("Longitude:", longitude);
+            console.log("Accuracy :", pos.coords.accuracy, "meter");
+
+            // Simpan untuk form
+            lat = latitude.toFixed(7);
+            lng = longitude.toFixed(7);
 
             document.getElementById('input-lat').value = lat;
             document.getElementById('input-lng').value = lng;
 
-            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
+            // Hapus marker lama
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            // Marker baru
+            marker = L.marker([latitude, longitude]).addTo(map);
+
+            // Fokus ke lokasi user
+            map.flyTo([latitude, longitude], 18, {
+                animate: true,
+                duration: 1
+            });
+
+            // Perbaiki render map di mobile
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 300);
+
+            // Ambil alamat
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
                 .then(r => r.json())
                 .then(d => {
-                    const addr = (d.display_name || `${lat}, ${lng}`).substring(0, 90);
+
+                    const addr = d.display_name ?? `${lat}, ${lng}`;
+
                     document.getElementById('lokasi-info').innerHTML =
                         `<span style="color:#16a34a;font-weight:600;">✓ Lokasi terdeteksi</span><br>${addr}`;
+
                 })
                 .catch(() => {
+
                     document.getElementById('lokasi-info').innerHTML =
-                        `<span style="color:#16a34a">✓ ${lat}, ${lng}</span>`;
+                        `<span style="color:#16a34a;">✓ ${lat}, ${lng}</span>`;
+
                 });
 
             checkReady();
-        }, () => {
+
+        },
+
+        function (err) {
+
+            console.error(err);
+
             document.getElementById('lokasi-info').innerHTML =
-                '<span style="color:#b91c1c">❌ Gagal. Izinkan akses lokasi di browser.</span>';
-        }, { enableHighAccuracy:true, timeout:12000 });
-    }
+                '<span style="color:#b91c1c">❌ Gagal mendapatkan lokasi. Pastikan GPS aktif dan browser diberi izin lokasi.</span>';
+
+        },
+
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+        }
+
+    );
+}
 
     /* ---- CAMERA ---- */
     async function startCamera() {

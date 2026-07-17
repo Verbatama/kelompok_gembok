@@ -23,7 +23,14 @@ return new class extends Migration {
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
             $table->boolean('is_late')->default(false);
+            $table->time('check_in_limit')->nullable();
 
+            // Rentang jam bonus check out
+                $table->time('bonus_check_out_mulai')->nullable();
+                $table->time('bonus_check_out_selesai')->nullable();
+
+                
+                $table->boolean('bonus_didapat')->default(false);
             $table->timestamps();
         });
     }

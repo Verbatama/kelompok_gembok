@@ -3,8 +3,21 @@
 @section('title', 'Proses Payroll')
 
 @section('content')
+<div class="min-h-screen bg-gray-100 dark:bg-slate-800 transition-colors duration-300" x-data="{
+         sidebarOpen: false,
+         isDark: localStorage.getItem('theme') === 'dark',
+         toggleTheme() {
+             this.isDark = !this.isDark;
+             localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+             document.documentElement.classList.toggle('dark', this.isDark);
+         }
+     }">
+    @include('admin.partials.sidebar')
 
-<div class="min-h-screen bg-gray-100 dark:bg-slate-900 p-6">
+    <div class="lg:pl-64">
+        @include('admin.partials.topbar')
+
+        <div class="p-6">
 
     <div class="max-w-3xl mx-auto">
 
@@ -32,7 +45,7 @@
 
             @csrf
 
-            <div class="bg-white dark:bg-slate-800 rounded-xl shadow p-6 space-y-6">
+            <div class="bg-white dark:bg-slate-700 rounded-xl shadow p-6 space-y-6">
 
                 <div>
 
@@ -41,7 +54,7 @@
                     </label>
 
                     <select name="technician_id" required
-                        class="w-full rounded-lg border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white">
+                        class="w-full rounded-lg border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white">
 
                         <option value="">-- Pilih Teknisi --</option>
 
@@ -65,7 +78,7 @@
                         </label>
 
                         <select name="bulan" required
-                            class="w-full rounded-lg border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white">
+                            class="w-full rounded-lg border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white">
 
                             @for($i=1;$i<=12;$i++) <option value="{{ $i }}" {{ old('bulan', now()->
                                 month)==$i?'selected':'' }}>
@@ -84,13 +97,13 @@
                         </label>
 
                         <input type="number" name="tahun" value="{{ old('tahun', now()->year) }}" required
-                            class="w-full rounded-lg border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white">
+                            class="w-full rounded-lg border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white">
 
                     </div>
 
                 </div>
 
-                <hr class="dark:border-slate-700">
+                <hr class="dark:border-slate-600">
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
 
@@ -101,7 +114,7 @@
                         </label>
 
                         <input type="number" name="denda_telat" value="{{ old('denda_telat',10000) }}" min="0" required
-                            class="w-full rounded-lg border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white">
+                            class="w-full rounded-lg border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white">
 
                     </div>
 
@@ -112,7 +125,7 @@
                         </label>
 
                         <input type="number" name="denda_absen" value="{{ old('denda_absen',50000) }}" min="0" required
-                            class="w-full rounded-lg border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white">
+                            class="w-full rounded-lg border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white">
 
                     </div>
 
@@ -125,14 +138,14 @@
                     </label>
 
                     <input type="number" name="bonus" value="{{ old('bonus',0) }}" min="0" required
-                        class="w-full rounded-lg border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white">
+                        class="w-full rounded-lg border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white">
 
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4">
 
                     <a href="{{ route('admin.payroll.index') }}"
-                        class="px-5 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-white">
+                        class="px-5 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 dark:bg-slate-600 dark:hover:bg-slate-500 dark:text-white">
                         Batal
                     </a>
 
@@ -151,6 +164,7 @@
 
     </div>
 
+        </div>
+    </div>
 </div>
-
 @endsection

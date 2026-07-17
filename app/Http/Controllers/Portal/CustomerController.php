@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Invoice;
+use App\Notifications\SystemNotification;
 use App\Services\PaymentGatewayService;
 use Illuminate\Http\Request;
 
@@ -53,7 +54,7 @@ class CustomerController extends Controller
         if (!$customer) {
             return redirect()->route('customer.login');
         }
-        
+
         $nextInvoice = Invoice::where('customer_id', $customer->id)
             ->where('status', 'unpaid')
             ->orderBy('due_date')
@@ -73,7 +74,7 @@ class CustomerController extends Controller
         if (!$customer) {
             return redirect()->route('customer.login');
         }
-        
+
         $invoices = Invoice::where('customer_id', $customer->id)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -87,7 +88,7 @@ class CustomerController extends Controller
         if (!$customer) {
             return redirect()->route('customer.login');
         }
-        
+
         if ($invoice->customer_id != $customer->id) {
             abort(403);
         }
@@ -104,7 +105,7 @@ class CustomerController extends Controller
         if (!$customer) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
         }
-        
+
         if ($invoice->customer_id != $customer->id) {
             return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
         }
@@ -118,7 +119,7 @@ class CustomerController extends Controller
         ]);
 
         $duitku = app(\App\Services\DuitkuService::class);
-        
+
         if (!$duitku->isEnabled()) {
             return response()->json(['success' => false, 'message' => 'Pembayaran online tidak tersedia']);
         }
@@ -162,7 +163,7 @@ class CustomerController extends Controller
         if (!$customer) {
             return redirect()->route('customer.login');
         }
-        
+
         $payments = Invoice::where('customer_id', $customer->id)
             ->where('status', 'paid')
             ->orderBy('updated_at', 'desc')
@@ -171,36 +172,36 @@ class CustomerController extends Controller
         return view('customer.payments', compact('customer', 'payments'));
     }
 
-        public function pay(Request $request, Invoice $invoice)
-        {
-            $customer = $this->getCustomer();
-            if (!$customer) {
-                return redirect()->route('customer.login');
-            }
-            
-            if ($invoice->customer_id != $customer->id) {
-                abort(403);
-            }
-
-            $paymentService = new PaymentGatewayService();
-            $gateway = $request->get('gateway', 'midtrans');
-
-            if ($gateway === 'midtrans') {
-                $result = $paymentService->createMidtransPayment($invoice, $customer);
-            } else {
-                $result = $paymentService->createXenditInvoice($invoice, $customer);
-            }
-
-            if (isset($result['redirect_url'])) {
-                return redirect($result['redirect_url']);
-            }
-
-            if (isset($result['snap_token'])) {
-                return view('customer.pay', compact('invoice', 'result'));
-            }
-
-            return back()->with('error', 'Gagal membuat pembayaran');
+    public function pay(Request $request, Invoice $invoice)
+    {
+        $customer = $this->getCustomer();
+        if (!$customer) {
+            return redirect()->route('customer.login');
         }
+
+        if ($invoice->customer_id != $customer->id) {
+            abort(403);
+        }
+
+        $paymentService = new PaymentGatewayService();
+        $gateway = $request->get('gateway', 'midtrans');
+
+        if ($gateway === 'midtrans') {
+            $result = $paymentService->createMidtransPayment($invoice, $customer);
+        } else {
+            $result = $paymentService->createXenditInvoice($invoice, $customer);
+        }
+
+        if (isset($result['redirect_url'])) {
+            return redirect($result['redirect_url']);
+        }
+
+        if (isset($result['snap_token'])) {
+            return view('customer.pay', compact('invoice', 'result'));
+        }
+
+        return back()->with('error', 'Gagal membuat pembayaran');
+    }
 
     public function profile()
     {
@@ -208,7 +209,7 @@ class CustomerController extends Controller
         if (!$customer) {
             return redirect()->route('customer.login');
         }
-        
+
         return view('customer.profile', compact('customer'));
     }
 
@@ -218,7 +219,7 @@ class CustomerController extends Controller
         if (!$customer) {
             return redirect()->route('customer.login');
         }
-        
+
         $request->validate([
             'phone' => 'required',
             'email' => 'nullable|email',
@@ -244,7 +245,7 @@ class CustomerController extends Controller
         if (!$customer) {
             return redirect()->route('customer.login');
         }
-        
+
         return view('customer.support', compact('customer'));
     }
 
@@ -262,7 +263,7 @@ class CustomerController extends Controller
             'message' => 'required|string',
         ]);
 
-        \App\Models\Ticket::create([
+        $ticket = \App\Models\Ticket::create([
             'ticket_number' => 'TKT-' . date('Ymd') . '-' . str_pad(\App\Models\Ticket::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT),
             'customer_id' => $customer->id,
             'subject' => $request->subject,
@@ -271,7 +272,17 @@ class CustomerController extends Controller
             'priority' => $request->priority ?? 'medium',
             'status' => 'open',
         ]);
-        
+
+        $users = \App\Models\User::all();
+        foreach ($users as $user) {
+            $user->notify(new SystemNotification(
+                title: "Tiket Customer",
+                message: "Pelanggan {$customer->username} Membuat Tiket",
+                url: route('admin.tickets.show', $ticket->id),
+                type: 'info'
+            ));
+        }
+
         return back()->with('success', 'Tiket berhasil dikirim. Tim kami akan segera menghubungi Anda.');
     }
 
@@ -281,7 +292,7 @@ class CustomerController extends Controller
         if (!$customer) {
             return redirect()->route('customer.login');
         }
-        
+
         $tickets = \App\Models\Ticket::where('customer_id', $customer->id)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -295,9 +306,7 @@ class CustomerController extends Controller
         if (!$customer) {
             return redirect()->route('customer.login');
         }
-        
+
         return view('customer.usage', compact('customer'));
     }
 }
-
-

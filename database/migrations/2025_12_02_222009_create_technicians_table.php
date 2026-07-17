@@ -4,8 +4,7 @@
     use Illuminate\Database\Schema\Blueprint;
     use Illuminate\Support\Facades\Schema;
 
-    return new class extends Migration
-    {
+    return new class extends Migration {
         /**
          * Run the migrations.
          */
@@ -24,6 +23,15 @@
                 $table->timestamp('join_date')->useCurrent();
                 $table->timestamp('last_login')->nullable();
                 $table->string('whatsapp_group_id')->nullable();
+
+                $table->time('check_in_limit')->nullable();
+
+               
+                // Rentang bonus check out
+                $table->time('bonus_check_out_mulai')->nullable();
+                $table->time('bonus_check_out_selesai')->nullable();
+
+                
                 $table->timestamps();
             });
         }

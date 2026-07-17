@@ -7,6 +7,7 @@ use App\Models\Package;
 use App\Services\PaymentGatewayService;
 use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
+use App\Notifications\SystemNotification;
 
 class OrderController extends Controller
 {
@@ -47,9 +48,9 @@ class OrderController extends Controller
         ]);
 
         $package = Package::findOrFail($validated['package_id']);
-        
+
         // Calculate pricing
-        $installationFee = 150000; // Default installation fee
+        $installationFee = 150000;  // Default installation fee
         $packagePrice = $package->price;
         $totalAmount = $packagePrice + $installationFee;
 
@@ -97,6 +98,19 @@ class OrderController extends Controller
                 ],
             ]);
 
+            $users = \App\Models\User::all();
+
+            foreach ($users as $user) {
+                $user->notify(
+                    new SystemNotification(
+                        title: 'Order Baru',
+                        message: "Order {$order->order_number} Nama:{$order->customer_name} Phone:{$order->customer_phone}",
+                        url: route('admin.orders.show', $order->id),
+                        type: 'info'
+                    )
+                );
+            }
+
             if ($paymentResult['success']) {
                 $order->update([
                     'payment_url' => $paymentResult['redirect_url'] ?? null,
@@ -128,7 +142,7 @@ class OrderController extends Controller
     public function track(Request $request)
     {
         $order = null;
-        
+
         if ($request->filled('order_number')) {
             $order = Order::where('order_number', $request->order_number)
                 ->orWhere('customer_phone', 'like', '%' . $request->order_number . '%')
@@ -145,15 +159,15 @@ class OrderController extends Controller
     protected function notifyAdmin(Order $order)
     {
         $adminPhone = config('services.whatsapp.admin_phone');
-        
+
         if ($adminPhone) {
             $message = "🆕 *Pesanan Baru!*\n\n";
             $message .= "📋 *Order:* {$order->order_number}\n";
             $message .= "👤 *Nama:* {$order->customer_name}\n";
             $message .= "📱 *Telepon:* {$order->customer_phone}\n";
             $message .= "📦 *Paket:* {$order->package->name}\n";
-            $message .= "💰 *Total:* Rp " . number_format($order->total_amount, 0, ',', '.') . "\n";
-            $message .= "🔌 *Tipe:* " . strtoupper($order->connection_type) . "\n\n";
+            $message .= '💰 *Total:* Rp ' . number_format($order->total_amount, 0, ',', '.') . "\n";
+            $message .= '🔌 *Tipe:* ' . strtoupper($order->connection_type) . "\n\n";
             $message .= "📍 *Alamat:*\n{$order->customer_address}";
 
             $this->whatsapp->send($adminPhone, $message);

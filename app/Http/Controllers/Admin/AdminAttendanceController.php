@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use App\Models\AdminLeaveRequest;
 
 class AdminAttendanceController extends Controller
 {
@@ -43,10 +44,32 @@ class AdminAttendanceController extends Controller
             'status'       => 'required|in:check-in,check-out',
             'latitude'     => 'nullable',
             'longitude'    => 'nullable',
+             'check_in_limit' => 'nullable|date_format:H:i',
+            'bonus_check_in_mulai' => 'nullable|date_format:H:i',
+            'bonus_check_in_selesai' => 'nullable|date_format:H:i',
+            'bonus_check_out_mulai' => 'nullable|date_format:H:i',
+            'bonus_check_out_selesai' => 'nullable|date_format:H:i',
         ]);
 
         $now = Carbon::now('Asia/Jakarta');
-       $limit = Carbon::today('Asia/Jakarta')->setTime(9, 10, 0);
+       $user = auth()->user();
+
+       // Cek apakah hari ini sedang libur
+        $today = Carbon::today('Asia/Jakarta');
+
+        $leave = AdminLeaveRequest::where('user_id', auth()->id())
+        ->whereDate('leave_date', $today)
+            ->exists();
+
+        if ($leave) {
+        return back()->with(
+        'error',
+        'Hari ini Anda sedang mengajukan libur sehingga tidak dapat melakukan absensi.'
+    );
+}
+
+         $limit = Carbon::today('Asia/Jakarta')
+        ->setTimeFromTimeString($user->check_in_limit);
 
        $terlambat = $request->status === 'check-in' && $now->greaterThan($limit);
 
@@ -81,12 +104,43 @@ class AdminAttendanceController extends Controller
 
         Storage::disk('public')->put('attendances/' . $filename, base64_decode($image));
 
+        $bonusDidapat = false;
+        
+        if ($leave) {
+    $bonusDidapat = false;
+}
+        
+
+        if ($request->status == 'check-in' && $now->lte($limit)) {
+    $bonusDidapat = true;
+
+}
+
+    if ($request->status == 'check-out') {
+
+    $mulaiBonus = Carbon::today('Asia/Jakarta')
+        ->setTimeFromTimeString($user->bonus_check_out_mulai);
+
+    $selesaiBonus = Carbon::today('Asia/Jakarta')
+        ->setTimeFromTimeString($user->bonus_check_out_selesai);
+
+    if ($now->between($mulaiBonus, $selesaiBonus)) {
+        $bonusDidapat = true;
+        $bonusNominal = $user->bonus_check_out_nominal;
+    }
+}
+
         AdminAttendance::create([
             'user_id'      => auth()->id(),
             'image_selfie' => 'attendances/' . $filename,
             'status'       => $request->status,
             'latitude'     => $request->latitude,
             'longitude'    => $request->longitude,
+            'check_in_limit'   => $user->check_in_limit,
+            'bonus_check_out_mulai'  => $user->bonus_check_out_mulai,
+            'bonus_check_out_selesai'=> $user->bonus_check_out_selesai,
+            
+            'bonus_didapat'=> $bonusDidapat,
         ]);
 
         if ($request->status === 'check-in') {

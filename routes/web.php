@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAttendanceController;
+use App\Http\Controllers\Admin\AdminLeaveRequestController;
 use App\Http\Controllers\Admin\AgentController;
 use App\Http\Controllers\Admin\AttendanceHistoryController;
 use App\Http\Controllers\Admin\CollectorController;
@@ -16,10 +17,8 @@ use App\Http\Controllers\Admin\TicketController;
 use App\Http\Controllers\Admin\TiketGangguanController;
 use App\Http\Controllers\Admin\VoucherController;
 use App\Http\Controllers\Portal\TechnicianAttendanceController;
+use App\Http\Controllers\Portal\TechnicianLeaveRequestController;
 use Illuminate\Support\Facades\Route;
-
-// superadmin
-Route::view('/dashboardsuper', 'superadmin.index')->name('dashboard');
 
 // ============================================================
 // Public Routes
@@ -57,6 +56,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/login', [DashboardController::class, 'login'])->name('login.post');
     Route::post('/logout', [DashboardController::class, 'logout'])->name('logout');
 
+    Route::resource('admins', \App\Http\Controllers\Admin\AdminController::class)
+        ->middleware(['auth', 'superadmin']);
+    Route::get('/riwayat-libur-admin', [\App\Http\Controllers\Admin\RiwayatLiburAdminController::class, 'index'])
+    ->name('riwayat-libur-admin.index')
+    ->middleware(['auth', 'superadmin']);
+
+Route::get('/attendance-admin/history', [\App\Http\Controllers\Admin\AdminAttendanceHistoryController::class, 'index'])
+    ->name('attendance-admin.history')
+    ->middleware(['auth', 'superadmin']);
     // Protected Admin Routes
     Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -68,9 +76,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/attendance-history', [AttendanceHistoryController::class, 'index'])
             ->name('attendance.history');
 
+        Route::get('/leave', [AdminLeaveRequestController::class, 'index'])->name('leave.index');
+        Route::get('/leave/create', [AdminLeaveRequestController::class, 'create'])->name('leave.create');
+        Route::post('/leave', [AdminLeaveRequestController::class, 'store'])->name('leave.store');
+        Route::delete('/leave/{id}', [AdminLeaveRequestController::class, 'destroy'])->name('leave.destroy');
+      Route::get('/riwayat-libur', [\App\Http\Controllers\Admin\RiwayatPengajuanLiburController::class, 'index'])
+      ->name('riwayat-libur.index');
         // Customer Management
         Route::resource('customers', CustomerController::class);
         Route::get('/customers/{customer}/invoices', [CustomerController::class, 'invoices'])->name('customers.invoices');
+
 
         // Package Management
         Route::resource('packages', PackageController::class);
@@ -351,14 +366,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/genieacs/test', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'testGenieacs'])->name('genieacs.test');
 
             // WhatsApp
-            Route::get('/whatsapp', [IntegrationSettingController::class, 'whatsapp'])
+            Route::get('/whatsapp', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'whatsapp'])
                 ->name('whatsapp');
 
-            Route::post('/whatsapp', [IntegrationSettingController::class, 'saveWhatsapp'])
+            Route::post('/whatsapp', [App\Http\Controllers\Admin\IntegrationSettingController::class, 'saveWhatsapp'])
                 ->name('whatsapp.save');
 
-            Route::post('/whatsapp/test', [IntegrationSettingController::class, 'testWhatsapp'])
-                ->name('whatsapp.test');    
+            Route::post('/whatsapp/test', [App\Http\Controllers\Admin\IntegrationSettingController::class, 'testWhatsapp'])
+                ->name('whatsapp.test');
 
             // Midtrans
             Route::get('/midtrans', [\App\Http\Controllers\Admin\IntegrationSettingController::class, 'midtrans'])->name('midtrans');
@@ -422,6 +437,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/payroll/create', [\App\Http\Controllers\Admin\TechnicianPayrollController::class, 'create'])
             ->name('payroll.create');
+        Route::get('/payroll/attendance-summary', [\App\Http\Controllers\Admin\TechnicianPayrollController::class, 'attendanceSummary'])
+    ->name('payroll.summary');
 
         Route::post('/payroll', [\App\Http\Controllers\Admin\TechnicianPayrollController::class, 'store'])
             ->name('payroll.store');
@@ -437,7 +454,49 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::delete('/payroll/{technicianPayroll}', [\App\Http\Controllers\Admin\TechnicianPayrollController::class, 'destroy'])
             ->name('payroll.destroy');
+
+        // notification
+        Route::prefix('notifications')
+            ->name('notifications.')
+            ->group(function () {
+                Route::get('/{id}/read', [App\Http\Controllers\Admin\NotificationController::class, 'read'])
+                    ->name('read');
+
+                Route::post('/read-all', [App\Http\Controllers\Admin\NotificationController::class, 'readAll'])
+                    ->name('read-all');
+            });
+
+        // genieacs Dash
+
+        Route::get('/genieacs/dashboard', [App\Http\Controllers\Admin\GenieDashController::class, 'genieDash'])->name('genieacs.dashboard');
+        Route::get('/genieacs/configuration', [App\Http\Controllers\Admin\GenieDashController::class, 'configuration'])->name('genieacs.configuration');
+        Route::get('/genieacs/devices', [App\Http\Controllers\Admin\GenieDashController::class, 'devices'])->name('genieacs.devices');
+
+        Route::get('/genieacs/devices/{device}', [App\Http\Controllers\Admin\GenieDashController::class, 'devicesDetail'])
+            ->name('genieacs.devicesDetail');
+
+        Route::get('/genieacs/map', [App\Http\Controllers\Admin\GenieDashController::class, 'map'])
+            ->name('genieacs.map');
     });
+});
+// Marketer Routes
+
+Route::prefix('marketer')->name('marketer.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Portal\MarketerController::class, 'dashboard'])->name('dashboard');
+    Route::get('/create/prospect', [\App\Http\Controllers\Portal\MarketerController::class, 'create'])->name('create_prospect');
+    Route::post('/create/prospect', [\App\Http\Controllers\Portal\MarketerController::class, 'create_prospect'])
+        ->name('store_prospect');
+    Route::get('/marketer/prospect/{id}', [\App\Http\Controllers\Portal\MarketerController::class, 'show'])
+        ->name('show');
+    Route::get('/prospect', [\App\Http\Controllers\Portal\MarketerController::class, 'daftar_prospect'])
+        ->name('index');
+
+    Route::get('/prospect/{id}/edit', [\App\Http\Controllers\Portal\MarketerController::class, 'edit'])
+        ->name('edit');
+    Route::put('/prospect/{id}', [\App\Http\Controllers\Portal\MarketerController::class, 'update'])
+        ->name('update');
+    Route::delete('/prospect/{id}', [\App\Http\Controllers\Portal\MarketerController::class, 'destroy'])
+        ->name('destroy');
 });
 
 // ============================================================
@@ -497,7 +556,17 @@ Route::prefix('technician')->name('technician.')->group(function () {
     Route::get('/attendance', [\App\Http\Controllers\Portal\TechnicianAttendanceController::class, 'index'])->name('attendance.index');
     Route::post('/attendance', [\App\Http\Controllers\Portal\TechnicianAttendanceController::class, 'store'])
         ->name('attendance.store');
+    Route::get('/leave', [TechnicianLeaveRequestController::class, 'index'])
+        ->name('leave.index');
 
+    Route::get('/leave/create', [TechnicianLeaveRequestController::class, 'create'])
+        ->name('leave.create');
+
+    Route::post('/leave', [TechnicianLeaveRequestController::class, 'store'])
+        ->name('leave.store');
+
+    Route::delete('/leave/{id}', [TechnicianLeaveRequestController::class, 'destroy'])
+        ->name('leave.destroy');
     Route::get('/tasks', [\App\Http\Controllers\Portal\TechnicianController::class, 'tasks'])->name('tasks');
     Route::get('/tasks/{task}', [\App\Http\Controllers\Portal\TechnicianController::class, 'showTask'])->name('tasks.show');
     Route::post('/tasks/{task}/update', [\App\Http\Controllers\Portal\TechnicianController::class, 'updateTask'])->name('tasks.update');

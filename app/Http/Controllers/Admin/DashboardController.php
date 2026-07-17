@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
@@ -66,8 +68,8 @@ class DashboardController extends Controller
         ];
 
         return view('admin.dashboard', compact(
-            'stats', 
-            'recent_invoices', 
+            'stats',
+            'recent_invoices',
             'recent_customers',
             'revenueData',
             'customerGrowth',
@@ -83,12 +85,31 @@ class DashboardController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-
-        if (auth()->attempt($credentials, $request->filled('remember'))) {
+    if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
+
+            $user = auth()->user();
+
+            $payload = [
+                'sub' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role ?? 'user',
+                'iat' => time(),
+                'exp' => time() + (60 * 60 * 24),
+            ];
+
+            $token = JWT::encode(
+                $payload,
+                env('JWT_SECRET'),
+                'HS256'
+            );
+
+            // Simpan token ke session Laravel
+            session(['jwt_token' => $token]);
+
             return redirect()->intended(route('admin.dashboard'));
         }
-
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
@@ -99,7 +120,7 @@ class DashboardController extends Controller
         auth()->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
+
         return redirect()->route('admin.login');
     }
 

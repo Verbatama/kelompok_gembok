@@ -19,52 +19,45 @@ class DatabaseSeeder extends Seeder
             // Core Settings
             UserSeeder::class,
             AppSettingSeeder::class,
-            
             // Package & Pricing
             PackageSeeder::class,
             VoucherPricingSeeder::class,
-            
             // Staff
             TechnicianSeeder::class,
             CollectorSeeder::class,
-            
             // Agent System
             AgentSeeder::class,
             AgentBalanceSeeder::class,
             AgentTransactionSeeder::class,
             AgentBalanceRequestSeeder::class,
             AgentNotificationSeeder::class,
-            
             // Network Infrastructure
             OdpSeeder::class,
             NetworkSegmentSeeder::class,
-            
             // Customers & Invoices
             CustomerSeeder::class,
             InvoiceSeeder::class,
             PaymentSeeder::class,
-            
             // Cable & ONU
             CableRouteSeeder::class,
             OnuDeviceSeeder::class,
             CableMaintenanceLogSeeder::class,
-            
             // Voucher System
             VoucherPurchaseSeeder::class,
             VoucherGenerationSettingSeeder::class,
             VoucherOnlineSettingSeeder::class,
             VoucherDeliveryLogSeeder::class,
-            
             // Agent Payments & Sales
             AgentPaymentSeeder::class,
             AgentMonthlyPaymentSeeder::class,
             AgentVoucherSaleSeeder::class,
-            
             // Summary
             MonthlySummarySeeder::class,
-            
             // Integration Settings
             IntegrationSettingsSeeder::class,
+            // telegram dash
+            TelegramRolePermissionsDashSeeder::class,
+            TelegramPermissionDashSeeder::class,
         ]);
     }
 }

@@ -176,7 +176,15 @@
 @endpush
 
 @section('content')
-<div style="max-width:960px;margin:0 auto;padding:1.5rem 1rem;">
+<div class="min-h-screen bg-gray-100 dark:bg-slate-800 transition-colors duration-300"
+     x-data="{ sidebarOpen: false }">
+
+    @include('admin.partials.sidebar')
+
+    <div class="lg:pl-64">
+        @include('admin.partials.topbar')
+
+        <div style="max-width:960px;margin:0 auto;padding:1.5rem 1rem;">
 
     <div style="margin-bottom:1.5rem;">
         <h1 style="font-size:22px;font-weight:700;color:#111827;margin:0;">Absensi</h1>
@@ -268,7 +276,7 @@
             <div class="card">
                 <div class="card-title">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    Status Absensi Hari Ini
+                        Status Absensi Hari Ini
                 </div>
                 <div style="margin-bottom:12px;">
                     <span class="s-badge {{ $sudahCheckout ? 'selesai' : ($sudahCheckin ? 'masuk' : 'belum') }}" id="s-badge">
@@ -280,16 +288,24 @@
                     <span class="lbl">Nama</span>
                     <span class="val">{{ auth()->user()->name }}</span>
                 </div>
+                <div class="info-row" style="background: #f9fafb; padding: 4px 6px; border-radius: 4px; margin-bottom: 4px;">
+                    <span class="lbl" style="color: #16a34a; font-weight: 600;">Jadwal Masuk</span>
+                    <span class="val" id="target-checkin">{{ auth()->user()->check_in_start }} - {{ auth()->user()->check_in_limit }}</span>
+                </div>
+                <div class="info-row" style="background: #f9fafb; padding: 4px 6px; border-radius: 4px; margin-bottom: 8px;">
+                    <span class="lbl" style="color: #dc2626; font-weight: 600;">Jadwal Keluar</span>
+                    <span class="val" id="target-checkout">{{ auth()->user()->check_out_start }} - {{ auth()->user()->check_out_limit }}</span>
+                </div>
+                ------------------------------------------
                 <div class="info-row">
-                    <span class="lbl">Check-In</span>
+                    <span class="lbl">Realisasi Check-In</span>
                     <span class="val">{{ $jamMasuk ?? '-' }}</span>
                 </div>
                 <div class="info-row">
-                    <span class="lbl">Check-Out</span>
+                    <span class="lbl">Realisasi Check-Out</span>
                     <span class="val">{{ $jamKeluar ?? '-' }}</span>
                 </div>
             </div>
-
             {{-- Tombol aksi --}}
             <div>
                 {{-- Check-In --}}
@@ -329,6 +345,8 @@
     </div>
 
 </div>
+</div>
+</div>
 
 {{-- Form tersembunyi — field name sesuai controller --}}
 <form id="form-absensi" method="POST" action="{{ route('admin.attendance.store') }}" style="display:none;">
@@ -362,52 +380,113 @@
     setInterval(tickClock, 1000);
     tickClock();
 
-    /* ---- MAP ---- */
-    function initMap() {
-        map = L.map('map', { zoomControl:true, attributionControl:false }).setView([-6.2, 106.816], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        getLocation();
+   /* ---- MAP ---- */
+function initMap() {
+    // Buat map tanpa posisi awal
+    map = L.map('map', {
+        zoomControl: true,
+        attributionControl: false
+    });
+
+    // Tile OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+    }).addTo(map);
+
+    // Posisi awal sementara (Indonesia)
+    map.setView([-2.5489, 118.0149], 5);
+
+    // Ambil lokasi user
+    getLocation();
+}
+
+function getLocation() {
+
+    if (!navigator.geolocation) {
+        document.getElementById('lokasi-info').innerHTML =
+            '<span style="color:#b91c1c">Browser tidak mendukung geolokasi.</span>';
+        return;
     }
 
-    function getLocation() {
-        if (!navigator.geolocation) {
-            document.getElementById('lokasi-info').innerHTML = '<span style="color:#b91c1c">Browser tidak mendukung geolokasi.</span>';
-            return;
-        }
-        document.getElementById('lokasi-info').innerHTML = '<span style="color:#ca8a04">⏳ Mendeteksi lokasi...</span>';
+    document.getElementById('lokasi-info').innerHTML =
+        '<span style="color:#ca8a04">⏳ Mendeteksi lokasi...</span>';
 
-        navigator.geolocation.getCurrentPosition(pos => {
+    navigator.geolocation.getCurrentPosition(
 
-        console.log("Latitude :", pos.coords.latitude);
-        console.log("Longitude:", pos.coords.longitude);
-        console.log("Accuracy :", pos.coords.accuracy, "meter");
+        function (pos) {
 
-        lat = pos.coords.latitude.toFixed(7);
-        lng = pos.coords.longitude.toFixed(7);
+            const latitude  = pos.coords.latitude;
+            const longitude = pos.coords.longitude;
 
-        if (marker) map.removeLayer(marker);
+            console.log("Latitude :", latitude);
+            console.log("Longitude:", longitude);
+            console.log("Accuracy :", pos.coords.accuracy, "meter");
+
+            // Simpan untuk form
+            lat = latitude.toFixed(7);
+            lng = longitude.toFixed(7);
+
             document.getElementById('input-lat').value = lat;
             document.getElementById('input-lng').value = lng;
 
-            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
+            // Hapus marker lama
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            // Marker baru
+            marker = L.marker([latitude, longitude]).addTo(map);
+
+            // Fokus ke lokasi user
+            map.flyTo([latitude, longitude], 18, {
+                animate: true,
+                duration: 1
+            });
+
+            // Perbaiki render map di mobile
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 300);
+
+            // Ambil alamat
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
                 .then(r => r.json())
                 .then(d => {
-                    const addr = (d.display_name || `${lat}, ${lng}`).substring(0, 90);
+
+                    const addr = d.display_name ?? `${lat}, ${lng}`;
+
                     document.getElementById('lokasi-info').innerHTML =
                         `<span style="color:#16a34a;font-weight:600;">✓ Lokasi terdeteksi</span><br>${addr}`;
+
                 })
                 .catch(() => {
+
                     document.getElementById('lokasi-info').innerHTML =
-                        `<span style="color:#16a34a">✓ ${lat}, ${lng}</span>`;
+                        `<span style="color:#16a34a;">✓ ${lat}, ${lng}</span>`;
+
                 });
 
             checkReady();
-        }, () => {
-            document.getElementById('lokasi-info').innerHTML =
-                '<span style="color:#b91c1c">❌ Gagal. Izinkan akses lokasi di browser.</span>';
-        }, { enableHighAccuracy:true, timeout:12000 });
-    }
 
+        },
+
+        function (err) {
+
+            console.error(err);
+
+            document.getElementById('lokasi-info').innerHTML =
+                '<span style="color:#b91c1c">❌ Gagal mendapatkan lokasi. Pastikan GPS aktif dan browser diberi izin lokasi.</span>';
+
+        },
+
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
+        }
+
+    );
+}
     /* ---- CAMERA ---- */
     async function startCamera() {
         try {

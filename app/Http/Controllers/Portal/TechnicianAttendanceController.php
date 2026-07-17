@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Models\Technician;
 use App\Models\TechnicianAttendance;
+use App\Models\TechnicianLeaveRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -68,8 +69,28 @@ class TechnicianAttendanceController extends Controller
         $now = Carbon::now('Asia/Jakarta');
         $today = Carbon::today('Asia/Jakarta');
 
+        // Cek apakah teknisi sedang libur
+        $leave = TechnicianLeaveRequest::where('technician_id', $techId)
+        ->whereDate('leave_date', $today)
+        ->exists();
+
+        if ($leave) {
+        return back()->with(
+        'error',
+        'Hari ini Anda sedang mengajukan libur sehingga tidak dapat melakukan absensi.'
+    );
+}
+
         // Batas terlambat
-        $limit = Carbon::today('Asia/Jakarta')->setTime(9, 10, 0);
+        $technician = Technician::findOrFail($techId);
+
+        if (!$technician->check_in_limit) {
+        return back()->with('error', 'Jam maksimal check-in belum diatur.');
+}
+        $limitTime = $technician->check_in_limit;
+
+        $limit = Carbon::today('Asia/Jakarta')
+        ->setTimeFromTimeString($limitTime);
 
         $terlambat = $request->status === 'check-in' && $now->greaterThan($limit);
 
@@ -107,6 +128,32 @@ class TechnicianAttendanceController extends Controller
             base64_decode($image)
         );
 
+        $bonusDidapat = false;
+
+        if ($leave) {
+        $bonusDidapat = false;
+        }
+        
+
+         if ($request->status == 'check-in' && $now->lte($limit)) {
+    $bonusDidapat = true;
+        
+}
+
+    if ($request->status == 'check-out') {
+
+    $mulaiBonus = Carbon::today('Asia/Jakarta')
+        ->setTimeFromTimeString($technician->bonus_check_out_mulai);
+
+    $selesaiBonus = Carbon::today('Asia/Jakarta')
+        ->setTimeFromTimeString($technician->bonus_check_out_selesai);
+
+    if ($now->between($mulaiBonus, $selesaiBonus)) {
+        $bonusDidapat = true;
+        
+    }
+}
+
         // Simpan absensi
         TechnicianAttendance::create([
             'technician_id' => $techId,
@@ -116,14 +163,21 @@ class TechnicianAttendanceController extends Controller
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'is_late' => $terlambat,
+            'check_in_limit' => $technician->check_in_limit,
+
+            'bonus_check_out_mulai' => $technician->bonus_check_out_mulai,
+            'bonus_check_out_selesai' => $technician->bonus_check_out_selesai, 
+           
+            'bonus_didapat'=> $bonusDidapat,
         ]);
 
         if ($request->status === 'check-in') {
             if ($terlambat) {
                 return back()->with(
-                    'warning',
-                    'Check-in berhasil. Anda terlambat (melewati pukul 09.10 WIB).'
-                );
+                'warning',
+                'Check-in berhasil. Anda terlambat (melewati pukul ' .
+                Carbon::parse($limitTime)->format('H:i') . ' WIB).'
+            );
             }
 
             return back()->with(

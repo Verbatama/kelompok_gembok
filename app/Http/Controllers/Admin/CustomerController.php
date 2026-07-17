@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Events\CustomerSuspended;
+use App\Http\Controllers\Controller;
 use App\Models\CustomerHousePhoto;
+use App\Notifications\SystemNotification;
 use App\Services\MikrotikService;
 use Illuminate\Http\Request;
-use App\Notifications\SystemNotification;
 use Illuminate\Support\Facades\Storage;
-
 
 class CustomerController extends Controller
 {
@@ -22,11 +21,12 @@ class CustomerController extends Controller
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('username', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -60,7 +60,7 @@ class CustomerController extends Controller
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
-            'discount'=>'nullable|numeric|min:0',
+            'discount' => 'nullable|numeric|min:0',
             'ktp_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'house_photos.*' => 'nullable|image|mimes:jpg,jpeg,png|max:4096',
             'package_id' => 'nullable|exists:packages,id',
@@ -72,34 +72,30 @@ class CustomerController extends Controller
         $validated['join_date'] = now();
 
         if ($request->hasFile('ktp_photo')) {
-        $validated['ktp_photo'] = $request
-        ->file('ktp_photo')
-        ->store('customers/ktp', 'public');
-}
+            $validated['ktp_photo'] = $request
+                ->file('ktp_photo')
+                ->store('customers/ktp', 'public');
+        }
         $customer = \App\Models\Customer::create($validated);
 
         if ($request->hasFile('house_photos')) {
-        foreach ($request->file('house_photos') as $photo) {
-
-        $customer->housePhotos()->create([
-            'photo' => $photo->store('customers/houses', 'public'),
-        ]);
-
-    }
-
-}
-         $users= \App\Models\User::all();
-         foreach( $users as $user ) {
+            foreach ($request->file('house_photos') as $photo) {
+                $customer->housePhotos()->create([
+                    'photo' => $photo->store('customers/houses', 'public'),
+                ]);
+            }
+        }
+        $users = \App\Models\User::all();
+        foreach ($users as $user) {
             $user->notify(
                 new SystemNotification(
                     title: 'Customer Baru',
-                    message:"Pelanggan {$customer->username} berhasil dibuat",
-                    url:route('admin.customers.show', $customer->id),
+                    message: "Pelanggan {$customer->username} berhasil dibuat",
+                    url: route('admin.customers.show', $customer->id),
                     type: 'success'
                 )
             );
-         }
-
+        }
 
         // Sync to Mikrotik if PPPoE credentials provided
         $mikrotikMessage = '';
@@ -114,7 +110,7 @@ class CustomerController extends Controller
                         'profile' => $package->pppoe_profile ?? 'default',
                         'comment' => "Customer: {$customer->name} (ID: {$customer->id})",
                     ]);
-                    
+
                     if ($result) {
                         $mikrotikMessage = ' PPPoE Secret berhasil dibuat di Mikrotik.';
                     } else {
@@ -129,14 +125,15 @@ class CustomerController extends Controller
             }
         }
 
-        return redirect()->route('admin.customers.index')
+        return redirect()
+            ->route('admin.customers.index')
             ->with('success', 'Customer created successfully!' . $mikrotikMessage);
     }
 
     public function show(\App\Models\Customer $customer)
     {
-        $customer->load(['package', 'invoices', 'cableRoutes', 'onuDevices']);
-        
+        $customer->load(['package', 'invoices', 'cableRoutes', 'onuDevices','housephotos']);
+
         $stats = [
             'total_invoices' => $customer->invoices()->count(),
             'paid_invoices' => $customer->invoices()->where('status', 'paid')->count(),
@@ -172,28 +169,42 @@ class CustomerController extends Controller
 
         $oldStatus = $customer->status;
         if ($request->hasFile('ktp_photo')) {
+            if ($customer->ktp_photo) {
+                Storage::disk('public')->delete($customer->ktp_photo);
+            }
 
-    if ($customer->ktp_photo) {
-        Storage::disk('public')->delete($customer->ktp_photo);
-    }
-
-     $validated['ktp_photo'] = $request
-        ->file('ktp_photo')
-        ->store('customers/ktp', 'public');
-}
+            $validated['ktp_photo'] = $request
+                ->file('ktp_photo')
+                ->store('customers/ktp', 'public');
+        }
         $customer->update($validated);
 
         if ($request->hasFile('house_photos')) {
+            foreach ($request->file('house_photos') as $photo) {
+                $customer->housePhotos()->create([
+                    'photo' => $photo->store('customers/houses', 'public'),
+                ]);
+            }
+        }
+        if ($oldStatus !== $validated['status']) {
+            $users = \App\Models\User::all();
+            $titles = [
+                'active' => 'Activated Customer',
+                'inactive' => 'Inactive Customer',
+                'suspended' => 'Suspended Customer',
+            ];
 
-    foreach ($request->file('house_photos') as $photo) {
-
-        $customer->housePhotos()->create([
-            'photo' => $photo->store('customers/houses', 'public'),
-        ]);
-
-    }
-
-}
+            foreach ($users as $user) {
+                $user->notify(
+                    new SystemNotification(
+                        title: $titles[$validated['status']],
+                        message: "Pelanggan {$customer->username} {$validated['status']}",
+                        url: route('admin.customers.show', $customer->id),
+                        type: 'info'
+                    )
+                );
+            }
+        }
 
         // Fire event if customer is suspended
         if ($oldStatus !== 'suspended' && $validated['status'] === 'suspended') {
@@ -201,9 +212,21 @@ class CustomerController extends Controller
         }
 
         // Sync with Mikrotik if PPPoE credentials changed (lazy load)
-        if ($customer->pppoe_username && $validated['status'] === 'active') {
+        $customer->update($validated);
+
+        if (
+            $customer->status === 'active' &&
+            $customer->pppoe_username &&
+            $customer->wasChanged([
+                'status',
+                'pppoe_username',
+                'pppoe_password',
+                'package_id',
+            ])
+        ) {
             try {
                 $mikrotik = app(MikrotikService::class);
+
                 if ($mikrotik->isConnected()) {
                     $mikrotik->createPPPoESecret([
                         'username' => $customer->pppoe_username,
@@ -213,12 +236,12 @@ class CustomerController extends Controller
                     ]);
                 }
             } catch (\Exception $e) {
-                // Log error but don't fail the request
                 \Log::warning('Mikrotik sync failed: ' . $e->getMessage());
             }
         }
 
-        return redirect()->route('admin.customers.index')
+        return redirect()
+            ->route('admin.customers.index')
             ->with('success', 'Customer updated successfully!');
     }
 
@@ -226,7 +249,8 @@ class CustomerController extends Controller
     {
         $customer->delete();
 
-        return redirect()->route('admin.customers.index')
+        return redirect()
+            ->route('admin.customers.index')
             ->with('success', 'Customer deleted successfully!');
     }
 
